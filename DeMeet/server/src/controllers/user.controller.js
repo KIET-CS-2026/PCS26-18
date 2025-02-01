@@ -3,46 +3,45 @@ import apiError from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
 import apiResponse from "../utils/apiResponse.js";
+import { z } from "zod";
 
 const registerUser = asyncHandler(async (req, res, next) => {
-  // get user details from frontend
-  // validation - not empty and correct format
-  // check if user already exist : Number and email
-  // check for avatar
-  // upload avatar to cloudinary
-  // create user object - create entry in db
-  // remove password and refresh token field free from response
-  // check for user creation
-  // return res
+  const userSchema = z.object({
+    name: z.string().nonempty("Name is required"),
+    email: z.string().email("Invalid email format"),
+    password: z.string().nonempty("Password is required"),
+    phoneNumber: z.string().nonempty("Phone number is required"),
+  });
 
-  const { name, email, password, number } = req.body;
-  // console.log("email: ", email);
-
-  if ([name, email, password, number].some((field) => field?.trim() === "")) {
-    throw new apiError(400, "All fields are required");
+  const validationResult = await userSchema.safeParse(req.body);
+  if (!validationResult.success) {
+    throw new apiError(400, validationResult.error.errors[0].message);
   }
 
-  const existedUser = User.findOne({ $or: [{ number }, { email }] });
+  const { name, email, password, phoneNumber } = validationResult.data;
+
+  const existedUser = await User.findOne({ $or: [{ phoneNumber }, { email }] });
   if (existedUser) {
-    throw new apiError(409, "User with email or number already exist");
+    throw new apiError(409, "User with email or phoneNumber already exist !");
   }
 
-  const avatarLocalPath = req.files?.avatar[0]?.path;
-  if (!avatarLocalPath) {
-    throw new apiError(400, "Avatar is required");
-  }
+  let avatar = null;
+  const avatarLocalPath = req.files?.avatar?.[0]?.path;
 
-  const avatar = await uploadToCloudinary(avatarLocalPath);
-  if (!avatar) {
-    throw new apiError(400, "Avatar upload error");
+  if (avatarLocalPath) {
+    const uploadedAvatar = await uploadToCloudinary(avatarLocalPath);
+    if (!uploadedAvatar) {
+      throw new apiError(400, "Avatar upload error");
+    }
+    avatar = uploadedAvatar.url;
   }
 
   const user = await User.create({
     name,
     email,
     password,
-    number,
-    avatar: avatar.url,
+    phoneNumber,
+    avatar,
   });
   const findUser = await User.findById(user._id).select(
     "-password -refreshToken"
