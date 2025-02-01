@@ -51,7 +51,12 @@ userSchema.methods.isPasswordCorrect = async function (enteredPassword) {
 
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
-    { _id: this._id, name: this.name, email: this.email },
+    {
+      _id: this._id,
+      name: this.name,
+      email: this.email,
+      wallet: this.walletId,
+    },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
   );
