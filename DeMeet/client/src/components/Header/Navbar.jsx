@@ -12,7 +12,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "../ui/dropdown-menu";
-import ModeToggle from "@/components/theme/ModeToggle";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 
 export default function Navbar() {
   return (
