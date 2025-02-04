@@ -1,12 +1,10 @@
-import Navbar from "../components/Header/Navbar";
 import MainArea from "../components/HomePage/MainArea";
 
 function LandingPage() {
   return (
-    <>
-      <Navbar />
+    <div className="">
       <MainArea />
-    </>
+    </div>
   );
 }
 
