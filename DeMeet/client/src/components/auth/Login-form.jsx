@@ -17,11 +17,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
-
+  const loginSchema = z.object({
+    email: z.string().email("Invalid email address"),
+    password: z.string(),
+  });
   const form = useForm({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
