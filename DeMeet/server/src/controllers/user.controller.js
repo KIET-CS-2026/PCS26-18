@@ -7,6 +7,12 @@ import { z } from "zod";
 import logger from "../utils/logger.js";
 import * as jwt from "jsonwebtoken";
 
+const options = {
+  httpOnly: true, // Should be true in both dev and prod
+  secure: process.env.ENVIRONMENT === "prod", // false in dev, true in prod
+  sameSite: process.env.ENVIRONMENT === "prod" ? "none" : "lax", // "lax" is more appropriate for dev
+};
+
 const generateAccessAndRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -105,10 +111,6 @@ const loginUser = asyncHandler(async (req, res, next) => {
   if (!loggedInUser) {
     throw new apiError(500, "Something went wrong while logging in user");
   }
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
 
   logger.info(`User logged in Successfully with Id ${user._id}`);
 
@@ -149,11 +151,6 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
       throw new apiError(401, "Refresh token is expired or used");
     }
 
-    const options = {
-      httpOnly: true,
-      secure: true,
-    };
-
     const { accessToken, refreshToken: newRefreshToken } =
       await generateAccessAndRefreshToken(user._id);
 
@@ -185,11 +182,6 @@ const logoutUser = asyncHandler(async (req, res, next) => {
       new: true,
     }
   );
-
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
 
   return res
     .status(200)
