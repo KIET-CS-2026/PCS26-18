@@ -1,9 +1,11 @@
-import MainArea from "../components/HomePage/MainArea";
+import Hero from "../components/HomePage/Hero";
+import Features from "@/components/HomePage/Features";
 
 function LandingPage() {
   return (
-    <div className="">
-      <MainArea />
+    <div className="w-full h-full">
+      <Hero />
+      <Features />
     </div>
   );
 }

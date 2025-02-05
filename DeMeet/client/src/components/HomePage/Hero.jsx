@@ -11,7 +11,7 @@ import { Info } from "lucide-react";
 
 export default function Hero() {
   return (
-    <div className="flex flex-col gap-8 md:flex-row items-center justify-center p-4 md:p-12">
+    <div className="flex flex-col gap-8 lg:flex-row items-center justify-center p-4 md:p-12">
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
           <img

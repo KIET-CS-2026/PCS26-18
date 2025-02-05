@@ -1,7 +1,6 @@
 import {
   BellRing,
   CircleUser,
-  Blocks,
   Settings,
   User2,
   LogOut,
