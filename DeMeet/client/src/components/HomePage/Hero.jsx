@@ -5,11 +5,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Info } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Hero() {
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col gap-8 lg:flex-row items-center justify-center p-4 md:p-12">
       <div className="flex flex-col gap-4">
@@ -36,7 +37,9 @@ export default function Hero() {
           </p>
         </div>
         <div className="flex flex-wrap gap-4 ">
-          <Button className="">Sign in</Button>
+          <Button onClick={() => navigate("/signup")} className="">
+            Sign in
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">

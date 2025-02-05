@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,9 +18,13 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/constants";
+import { useNavigate } from "react-router-dom";
+import { Alert } from "@/components/ui/alert";
 
 const LoginForm = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
     password: z.string(),
@@ -34,13 +37,31 @@ const LoginForm = () => {
     },
   });
 
-  const handleSubmit = async (data) => {
-    setIsLoading(true);
-    try {
-      console.log(data);
-    } finally {
-      setIsLoading(false);
-    }
+  const { mutate, isLoading, error } = useMutation({
+    mutationFn: async (data) => {
+      const response = await fetch(`${api}users/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Login failed");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      // Handle successful login, e.g., store token, redirect, etc.
+      navigate("/");
+    },
+  });
+
+  const handleSubmit = (data) => {
+    mutate(data);
   };
 
   return (
@@ -49,6 +70,11 @@ const LoginForm = () => {
         <CardTitle className="text-2xl text-center">Login</CardTitle>
       </CardHeader>
       <CardContent>
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            {error.message}
+          </Alert>
+        )}
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
