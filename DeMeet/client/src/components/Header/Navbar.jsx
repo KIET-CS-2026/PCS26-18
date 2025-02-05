@@ -20,7 +20,16 @@ export default function Navbar() {
       <div className="p-2 md:p-4 md:px-6 w-full">
         <div className="flex justify-between items-center">
           <div className="flex items-center justify-center gap-4">
-            <Blocks className="h-6 w-6" />
+            <img
+              src="/logo_light.png"
+              alt="DeMeet"
+              className="w-12 object-cover dark:hidden"
+            />
+            <img
+              src="/logo_dark.png"
+              alt="DeMeet"
+              className="w-12 object-cover hidden dark:block"
+            />{" "}
             <a href="/" className="text-xl font-semibold">
               DeMeet
             </a>
