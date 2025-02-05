@@ -11,7 +11,7 @@ import { Info } from "lucide-react";
 
 export default function Hero() {
   return (
-    <div className="flex items-center justify-center p-4 md:p-12">
+    <div className="flex flex-col gap-8 md:flex-row items-center justify-center p-4 md:p-12">
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
           <img
@@ -26,7 +26,7 @@ export default function Hero() {
           />
           <span className="text-3xl font-bold mb-1">DeMeet</span>
         </div>
-        <div className="flex flex-col gap-4 lg:w-1/2">
+        <div className="flex flex-col gap-4">
           <h1 className="text-4xl md:text-6xl font-bold flex flex-wrap">
             Decentralized Meetings for the Web3 Era
           </h1>
@@ -57,8 +57,17 @@ export default function Hero() {
           <Info className="h-4 w-4" />
         </div>
       </div>
-      <div>
-
+      <div className="w-3/4 h-full">
+        <img
+          src="/hero_light.png"
+          alt="DeMeet"
+          className="object-cover dark:hidden"
+        />
+        <img
+          src="/hero_dark.png"
+          alt="DeMeet"
+          className="object-cover hidden dark:block"
+        />
       </div>
     </div>
   );
