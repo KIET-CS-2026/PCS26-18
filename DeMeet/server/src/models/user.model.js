@@ -15,15 +15,9 @@ const userSchema = new Schema(
       unique: true,
       lowercase: true,
     },
-    phoneNumber: {
-      type: String,
-      required: true,
-      unique: true,
-    },
     walletId: {
       type: String,
       unique: true,
-      sparse: true, // This ensures that the unique index ignores null values
     },
     password: {
       type: String,
