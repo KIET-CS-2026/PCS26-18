@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import logger from "./utils/logger.js";
 import morgan from "morgan";
-
+import errorHandler from "./middlewares/error.middleware.js";
 const app = express();
 
 app.use(
@@ -44,6 +44,7 @@ app.use(cookieParser());
 import userRouter from "./routes/user.routes.js";
 
 //routes declaration
-app.use("/api/v1/users", userRouter);
+app.use("/api/users", userRouter);
 
+app.use(errorHandler);
 export default app;
