@@ -4,6 +4,7 @@ import Navbar from "./components/Header/Navbar";
 import LoginForm from "./components/auth/Login-form";
 import SignupForm from "./components/auth/SignupForm";
 import MainArea from "./components/HomePage/MainArea";
+import Hero from "./components/HomePage/Hero";
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
           <div className="container mx-auto p-4 min-h-full flex items-center justify-center">
             <Router>
               <Routes>
-                <Route path="" element={<MainArea />} />
+                <Route path="" element={<Hero />} />
                 <Route path="login" element={<LoginForm />} />
                 <Route path="signup" element={<SignupForm />} />
               </Routes>
