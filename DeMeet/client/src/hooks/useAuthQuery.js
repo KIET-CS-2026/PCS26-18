@@ -8,7 +8,7 @@ export const useAuthQuery = () => {
   return useQuery({
     queryKey: ["auth"],
     queryFn: checkAuth,
-    enabled: !user, // Only run if user is not present
+    enabled: user === undefined, // Only run if user is not present
     retry: false,
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,

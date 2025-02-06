@@ -4,7 +4,7 @@ import Navbar from "./components/Header/Navbar";
 import LoginForm from "./components/auth/Login-form";
 import SignupForm from "./components/auth/SignupForm";
 import LandingPage from "./pages/LandingPage";
-import ProtecteRoute from "./components/ProtecteRoute";
+import ProtectRoute from "./components/ProtectRoute";
 import Dashboard from "./pages/Dashboard";
 import AuthRoute from "./components/AuthRoute";
 import Footer from "./components/Footer/Footer";
@@ -41,9 +41,9 @@ function App() {
                 <Route
                   path="/dashboard"
                   element={
-                    <ProtecteRoute>
+                    <ProtectRoute>
                       <Dashboard />
-                    </ProtecteRoute>
+                    </ProtectRoute>
                   }
                 />
               </Routes>

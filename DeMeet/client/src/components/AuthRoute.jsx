@@ -18,10 +18,8 @@ const AuthRoute = ({ children }) => {
   }
 
   // If user is authenticated, redirect to home or the page they came from
-  if (user) {
-    return (
-      <Navigate to={location.state?.from?.pathname || "/dashboard"} replace />
-    );
+  if (user && location.pathname !== "/dashboard") {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;

@@ -3,7 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useAuthQuery } from "../hooks/useAuthQuery";
 import PropTypes from "prop-types";
 
-const ProtecteRoute = ({ children }) => {
+const ProtectRoute = ({ children }) => {
   const { user } = useAuth();
   const { isLoading, isError } = useAuthQuery();
   const location = useLocation();
@@ -22,8 +22,8 @@ const ProtecteRoute = ({ children }) => {
 
   return children;
 };
-ProtecteRoute.propTypes = {
+ProtectRoute.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default ProtecteRoute;
+export default ProtectRoute;
