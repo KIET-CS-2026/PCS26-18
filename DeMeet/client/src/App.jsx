@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Header/Navbar";
 import LoginForm from "./components/auth/Login-form";
 import SignupForm from "./components/auth/SignupForm";
-// import MainArea from "./components/HomePage/MainArea";
 import LandingPage from "./pages/LandingPage";
 import ProtecteRoute from "./components/ProtecteRoute";
 import Dashboard from "./pages/Dashboard";
 import AuthRoute from "./components/AuthRoute";
+import Footer from "./components/Footer/Footer";
 
 function App() {
   return (
@@ -51,6 +51,8 @@ function App() {
           </div>
         </main>
       </div>
+
+      <Footer className="flex-none" />
     </div>
   );
 }

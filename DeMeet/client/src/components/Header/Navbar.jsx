@@ -11,6 +11,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 
 export default function Navbar() {
@@ -36,11 +37,14 @@ export default function Navbar() {
 
           <div className="flex gap-4 sm:gap-8">
             <div className="flex items-center gap-4 sm:gap-8">
-              <BellRing className="w-6 h-6" />
+              <Button variant="outline" className="">
+                DashBoard
+              </Button>
+              <BellRing className="h-[1.2rem] w-[1.2rem]" />
               <ModeToggle />
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <CircleUser className="w-6 h-6" />
+                  <CircleUser className="h-[1.2rem] w-[1.2rem]" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="">
                   <DropdownMenuItem>
