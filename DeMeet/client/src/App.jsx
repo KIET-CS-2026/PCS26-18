@@ -5,6 +5,9 @@ import LoginForm from "./components/auth/Login-form";
 import SignupForm from "./components/auth/SignupForm";
 // import MainArea from "./components/HomePage/MainArea";
 import LandingPage from "./pages/LandingPage";
+import ProtecteRoute from "./components/ProtecteRoute";
+import Dashboard from "./pages/Dashboard";
+import AuthRoute from "./components/AuthRoute";
 
 function App() {
   return (
@@ -19,8 +22,30 @@ function App() {
             <Router>
               <Routes>
                 <Route path="/" element={<LandingPage />} />
-                <Route path="login" element={<LoginForm />} />
-                <Route path="signup" element={<SignupForm />} />
+                <Route
+                  path="login"
+                  element={
+                    <AuthRoute>
+                      <LoginForm />
+                    </AuthRoute>
+                  }
+                />
+                <Route
+                  path="signup"
+                  element={
+                    <AuthRoute>
+                      <SignupForm />
+                    </AuthRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtecteRoute>
+                      <Dashboard />
+                    </ProtecteRoute>
+                  }
+                />
               </Routes>
             </Router>
           </div>

@@ -10,8 +10,24 @@ import * as jwt from "jsonwebtoken";
 const options = {
   httpOnly: true, // Should be true in both dev and prod
   secure: process.env.ENVIRONMENT === "prod", // false in dev, true in prod
-  sameSite: process.env.ENVIRONMENT === "prod" ? "none" : "lax", // "lax" is more appropriate for dev
+  sameSite: "lax", // "lax" is more appropriate for dev
+  path: "/",
+  maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days in milliseconds
 };
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+  // req.user is already available from verifyJWT middleware
+  // and it already excludes password and refreshToken
+  return res
+    .status(200)
+    .json(
+      new apiResponse(
+        200,
+        { user: req.user },
+        "Current user fetched successfully"
+      )
+    );
+});
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -79,7 +95,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
 
   return res
     .status(201)
-    .json(new apiResponse(200, findUser, "User Registered Successfully"));
+    .json(new apiResponse(201, findUser, "User Registered Successfully"));
 });
 
 const loginUser = asyncHandler(async (req, res, next) => {
@@ -94,7 +110,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
   const { email, password } = validationResult.data;
   const user = await User.findOne({ email });
   if (!user) {
-    throw new apiError(404, "User does not exist");
+    throw new apiError(401, "User does not exist");
   }
   const isPasswordValid = await user.isPasswordCorrect(password);
   if (!isPasswordValid) {
@@ -154,7 +170,7 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
     const { accessToken, refreshToken: newRefreshToken } =
       await generateAccessAndRefreshToken(user._id);
 
-    return res
+    res
       .status(200)
       .cookie("accessToken", accessToken, options)
       .cookie("refreshToken", newRefreshToken, options)
@@ -190,4 +206,10 @@ const logoutUser = asyncHandler(async (req, res, next) => {
     .json(new apiResponse(200, {}, "User logged out successfully"));
 });
 
-export { registerUser, loginUser, refreshAccessToken, logoutUser };
+export {
+  getCurrentUser,
+  registerUser,
+  loginUser,
+  refreshAccessToken,
+  logoutUser,
+};

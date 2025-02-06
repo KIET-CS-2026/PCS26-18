@@ -19,16 +19,19 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { api } from "@/constants";
-import { useNavigate } from "react-router-dom";
-import { Alert } from "@/components/ui/alert";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Alert } from "../ui/alert";
+import { useAuth } from "../../contexts/AuthContext";
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
+
   const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
-    password: z.string(),
+    password: z.string().min(1, "Password is required"),
   });
+
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -39,23 +42,10 @@ const LoginForm = () => {
 
   const { mutate, isLoading, error } = useMutation({
     mutationFn: async (data) => {
-      const response = await fetch(`${api}users/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Login failed");
-      }
-
-      return response.json();
+      return await login(data);
     },
     onSuccess: () => {
-      // Handle successful login, e.g., store token, redirect, etc.
+      // Navigate to the page user tried to visit before being redirected to login
       navigate("/");
     },
   });
@@ -87,7 +77,12 @@ const LoginForm = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your email" {...field} />
+                    <Input
+                      placeholder="Enter your email"
+                      {...field}
+                      disabled={isLoading}
+                      autoComplete="email"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -104,6 +99,8 @@ const LoginForm = () => {
                       type="password"
                       placeholder="Enter your password"
                       {...field}
+                      disabled={isLoading}
+                      autoComplete="current-password"
                     />
                   </FormControl>
                   <FormMessage />
@@ -111,13 +108,11 @@ const LoginForm = () => {
               )}
             />
             <div className="flex justify-end">
-              <Button
-                variant="link"
-                className="px-0 font-normal"
-                onClick={() => (window.location.href = "/forgot-password")}
-              >
-                Forgot password?
-              </Button>
+              <Link to="/forgot-password">
+                <Button variant="link" className="px-0 font-normal">
+                  Forgot password?
+                </Button>
+              </Link>
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Logging in..." : "Login"}
@@ -148,13 +143,11 @@ const LoginForm = () => {
       <CardFooter className="flex justify-center">
         <p className="text-sm text-gray-600">
           Don&apos;t have an account?{" "}
-          <Button
-            variant="link"
-            className="px-1 font-normal"
-            onClick={() => (window.location.href = "/signup")}
-          >
-            Sign up
-          </Button>
+          <Link to="/signup">
+            <Button variant="link" className="px-1 font-normal">
+              Sign up
+            </Button>
+          </Link>
         </p>
       </CardFooter>
     </Card>

@@ -170,7 +170,7 @@ export default function SignupForm() {
                 <FormItem>
                   <FormLabel>Profile Picture (Optional)</FormLabel>
                   <FormControl>
-                    <Input type="file" {...field} optional />
+                    <Input type="file" {...field} optional="true" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
