@@ -3,12 +3,7 @@ import PropTypes from "prop-types";
 import { useQueryClient } from "@tanstack/react-query";
 import api from "../lib/axios";
 
-const AuthContext = createContext({
-  user: null,
-  login: async () => {},
-  logout: async () => {},
-  checkAuth: async () => {},
-});
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -17,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     const response = await api.post("/users/login", credentials);
     setUser(response.data.data.user);
-    return response.data.data;
+    return response.data;
   };
 
   const logout = async () => {
