@@ -10,11 +10,11 @@ export default function Home() {
 
   const createAndJoin = () => {
     const roomId = uuidv4();
-    navigate(`/${roomId}`);
+    navigate(`/room/${roomId}`);
   };
 
   const joinRoom = () => {
-    if (roomId) navigate(`/${roomId}`);
+    if (roomId) navigate(`/room/${roomId}`);
     else {
       alert("Please provide a valid room id");
     }
