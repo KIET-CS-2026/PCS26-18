@@ -19,7 +19,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Alert } from "../ui/alert";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -46,7 +46,7 @@ const LoginForm = () => {
     },
     onSuccess: () => {
       // Navigate to the page user tried to visit before being redirected to login
-      navigate("/");
+      navigate("/dashboard");
     },
   });
 
