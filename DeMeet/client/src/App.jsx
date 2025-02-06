@@ -8,6 +8,7 @@ import ProtectRoute from "./components/ProtectRoute";
 import Dashboard from "./pages/Dashboard";
 import AuthRoute from "./components/AuthRoute";
 import Footer from "./components/Footer/Footer";
+import Room from "./pages/Room";
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
                     </ProtectRoute>
                   }
                 />
+                <Route path="/room/:roomId" element={<Room />} />
               </Routes>
             </Router>
           </div>
