@@ -134,7 +134,7 @@ const Room = () => {
   }, [myId, setPlayers, stream]);
 
   return (
-    <div className="relative w-full h-screen bg-gray-800">
+    <div className="relative w-full h-[calc(100vh-12rem)] bg-gray-800">
       <div className="absolute top-0 left-0 right-0 bottom-12 mx-auto">
         {playerHighlighted && (
           <Player
