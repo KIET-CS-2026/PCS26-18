@@ -14,14 +14,33 @@ import {
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@/constants";
 import { Alert } from "@/components/ui/alert";
+
+const signupSchema = z
+  .object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Invalid email address"),
+    phoneNumber: z.string().min(1, "Phone number is required"),
+    password: z.string().min(8, "Password must be at least 6 characters"),
+    confirmPassword: z
+      .string()
+      .min(8, "Confirm password must be at least 6 characters"),
+    profilePicture: z.any().optional(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const form = useForm({
+    resolver: zodResolver(signupSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -33,9 +52,13 @@ export default function SignupForm() {
 
   const { mutate, isLoading, error } = useMutation({
     mutationFn: async (data) => {
+      const { confirmPassword, ...rest } = data; // Exclude confirmPassword
       const response = await fetch(`${api}users/register`, {
         method: "POST",
-        body: data,
+        body: JSON.stringify(rest),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
       if (!response.ok) {
