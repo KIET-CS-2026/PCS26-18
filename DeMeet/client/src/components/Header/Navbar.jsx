@@ -13,8 +13,12 @@ import {
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Navbar() {
+  const{logout} = useAuth();
+  const navigate = useNavigate();
   return (
     <nav className="flex border-b bg-background w-full shadow-md">
       <div className="p-2 md:p-4 md:px-6 w-full">
@@ -37,7 +41,11 @@ export default function Navbar() {
 
           <div className="flex gap-4 sm:gap-8">
             <div className="flex items-center gap-4 sm:gap-8">
-              <Button variant="outline" className="">
+              <Button
+                variant="outline"
+                className=""
+                onClick={() => navigate("/dashboard")}
+              >
                 DashBoard
               </Button>
               <BellRing className="h-[1.2rem] w-[1.2rem]" />
@@ -55,7 +63,7 @@ export default function Navbar() {
                     <Settings className="w-4 h-4 sm:w-6 sm:h-6" />
                     Settings
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout}>
                     <LogOut className="w-4 h-4 sm:w-6 sm:h-6" />
                     Logout
                   </DropdownMenuItem>

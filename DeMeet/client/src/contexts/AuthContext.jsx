@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
     await api.post("/users/logout");
     setUser(null);
     queryClient.clear(); // Clear all React Query caches
+    window.location.reload(); // Reload the page to clear all context
   };
 
   const checkAuth = async () => {

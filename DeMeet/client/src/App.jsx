@@ -14,13 +14,13 @@ function App() {
   return (
     <div className="flex flex-col h-screen">
       {/* Navbar - fixed at top */}
-      <Navbar className="flex-none" />
+      <Router>
+        <Navbar className="flex-none" />
 
-      {/* Main content area - scrollable */}
-      <div className="flex-1 overflow-hidden">
-        <main className="h-full overflow-y-auto">
-          <div className="container mx-auto p-4 min-h-full flex items-center justify-center">
-            <Router>
+        {/* Main content area - scrollable */}
+        <div className="flex-1 overflow-hidden">
+          <main className="h-full overflow-y-auto">
+            <div className="container mx-auto p-4 min-h-full flex items-center justify-center">
               <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route
@@ -49,12 +49,12 @@ function App() {
                 />
                 <Route path="/room/:roomId" element={<Room />} />
               </Routes>
-            </Router>
-          </div>
-        </main>
-      </div>
+            </div>
+          </main>
+        </div>
 
-      <Footer className="flex-none" />
+        <Footer className="flex-none" />
+      </Router>
     </div>
   );
 }
