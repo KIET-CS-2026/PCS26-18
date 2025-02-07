@@ -8,7 +8,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN,
+    origin:
+      process.env.ENVIRONMENT === "dev"
+        ? "http://localhost:5173" // Your frontend URL in development
+        : "https://yourproductionurl.com",
     credentials: true,
   })
 );

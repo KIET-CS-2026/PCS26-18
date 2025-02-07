@@ -12,17 +12,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { api } from "@/constants";
+import { Alert } from "@/components/ui/alert";
 
-const registerSchema = z
+const signupSchema = z
   .object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
+    name: z.string().min(1, "Name is required"),
     email: z.string().email("Invalid email address"),
-    phone: z.string().min(10, "Phone number must be at least 10 digits"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string(),
+    phoneNumber: z.string().min(1, "Phone number is required"),
+    password: z.string().min(8, "Password must be at least 6 characters"),
+    confirmPassword: z
+      .string()
+      .min(8, "Confirm password must be at least 6 characters"),
     profilePicture: z.any().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -33,20 +38,43 @@ const registerSchema = z
 export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
   const form = useForm({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(signupSchema),
     defaultValues: {
       name: "",
       email: "",
-      phone: "",
+      phoneNumber: "",
       password: "",
       confirmPassword: "",
-      profilePicture: null,
+    },
+  });
+
+  const { mutate, isLoading, error } = useMutation({
+    mutationFn: async (data) => {
+      const { confirmPassword, ...rest } = data; // Exclude confirmPassword
+      const response = await fetch(`${api}users/register`, {
+        method: "POST",
+        body: JSON.stringify(rest),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Registration failed");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      navigate("/login");
     },
   });
 
   function onSubmit(data) {
-    console.log("Registered Data:", data);
+    mutate(data);
   }
 
   return (
@@ -55,6 +83,11 @@ export default function SignupForm() {
         <CardTitle className="text-2xl">Register</CardTitle>
       </CardHeader>
       <CardContent>
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            {error.message}
+          </Alert>
+        )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
             <FormField
@@ -91,7 +124,7 @@ export default function SignupForm() {
 
             <FormField
               control={form.control}
-              name="phone"
+              name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Phone Number</FormLabel>
@@ -160,15 +193,15 @@ export default function SignupForm() {
                 <FormItem>
                   <FormLabel>Profile Picture (Optional)</FormLabel>
                   <FormControl>
-                    <Input type="file" {...field} />
+                    <Input type="file" {...field} optional="true" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Button type="submit" className="w-full">
-              Register
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Registering..." : "Register"}
             </Button>
 
             <div className="text-center text-sm">
