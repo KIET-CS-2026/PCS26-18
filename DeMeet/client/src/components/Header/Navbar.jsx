@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Navbar() {
-  const{logout} = useAuth();
+  const{logout, user} = useAuth();
   const navigate = useNavigate();
   return (
     <nav className="flex border-b bg-background w-full shadow-md">
@@ -50,25 +50,31 @@ export default function Navbar() {
               </Button>
               <BellRing className="h-[1.2rem] w-[1.2rem]" />
               <ModeToggle />
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <CircleUser className="h-[1.2rem] w-[1.2rem]" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="">
-                  <DropdownMenuItem>
-                    <User2 className="w-4 h-4 sm:w-6 sm:h-6" />
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="w-4 h-4 sm:w-6 sm:h-6" />
-                    Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={logout}>
-                    <LogOut className="w-4 h-4 sm:w-6 sm:h-6" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <CircleUser className="h-[1.2rem] w-[1.2rem]" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem>
+                      <User2 className="w-4 h-4 sm:w-6 sm:h-6" />
+                      Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Settings className="w-4 h-4 sm:w-6 sm:h-6" />
+                      Settings
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={logout}>
+                      <LogOut className="w-4 h-4 sm:w-6 sm:h-6" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button variant="default" onClick={() => navigate("/signup")}>
+                  Sign In
+                </Button>
+              )}
             </div>
           </div>
         </div>

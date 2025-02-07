@@ -19,7 +19,7 @@ function App() {
 
         {/* Main content area - scrollable */}
         <div className="flex-1 overflow-hidden">
-          <main className="h-full overflow-y-auto">
+          <main className="h-full overflow-y-auto scrollbar-thin">
             <div className="container mx-auto p-4 min-h-full flex items-center justify-center">
               <Routes>
                 <Route path="/" element={<LandingPage />} />
