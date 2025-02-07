@@ -44,7 +44,7 @@ export default function Hero() {
               Go to Dashboard
             </Button>
           ) : (
-            <Button onClick={() => navigate("/signin")}>Sign in</Button>
+            <Button onClick={() => navigate("/signup")}>Sign in</Button>
           )}
 
           <DropdownMenu>
