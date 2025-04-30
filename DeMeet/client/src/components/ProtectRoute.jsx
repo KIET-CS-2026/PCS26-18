@@ -2,28 +2,43 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useAuthQuery } from "../hooks/useAuthQuery";
 import PropTypes from "prop-types";
+import useAuthStore from "../store/authStore";
 
-const ProtectRoute = ({ children }) => {
+const ProtectRoute = ({ children, roles = [], isPublic = false }) => {
   const { user } = useAuth();
+  const { isAuthenticated } = useAuthStore();
   const { isLoading, isError } = useAuthQuery();
   const location = useLocation();
+
+  // For public routes, don't check authentication
+  if (isPublic) {
+    return children;
+  }
 
   if (isLoading) {
     return (
       <div className="w-full h-full flex justify-center items-center">
-        Loading...
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  if (isError || !user) {
+  if (isError || !user || !isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Check if user has required roles
+  if (roles.length > 0 && !roles.includes(user.role)) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
   return children;
 };
+
 ProtectRoute.propTypes = {
   children: PropTypes.node.isRequired,
+  roles: PropTypes.arrayOf(PropTypes.string),
+  isPublic: PropTypes.bool,
 };
 
 export default ProtectRoute;

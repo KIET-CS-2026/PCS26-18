@@ -1,5 +1,7 @@
 import axios from "axios";
 import { api as x } from "@/constants";
+import useAuthStore from "@/store/authStore";
+
 const api = axios.create({
   baseURL: x,
   withCredentials: true, // Important for handling cookies
@@ -21,6 +23,19 @@ const processQueue = (error, token = null) => {
 
   failedQueue = [];
 };
+
+api.interceptors.request.use(
+  (config) => {
+    const { accessToken } = useAuthStore.getState();
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 api.interceptors.response.use(
   (response) => response,
@@ -45,14 +60,16 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const response = await api.post("/api/refreshAccess");
+        const response = await api.post("/users/refreshAccess");
+        const { accessToken, refreshToken } = response.data.data;
+        useAuthStore.getState().setAuth(null, accessToken, refreshToken);
         isRefreshing = false;
-        processQueue(null, response.data.token);
+        processQueue(null, accessToken);
         return api(originalRequest);
       } catch (refreshError) {
         isRefreshing = false;
         processQueue(refreshError, null);
-        // Clear auth state here
+        useAuthStore.getState().clearAuth();
         return Promise.reject(refreshError);
       }
     }

@@ -14,7 +14,7 @@ const Room = () => {
   const socket = useSocket();
   const { roomId } = useParams(); // Access roomId from the URL
   const { peer, myId } = usePeer();
-  const { stream } = useMediaStream();
+  const { stream, screenStream, startScreenShare, stopScreenShare } = useMediaStream();
   const {
     players,
     setPlayers,
@@ -26,6 +26,53 @@ const Room = () => {
   } = usePlayer(myId, roomId, peer);
 
   const [users, setUsers] = useState([]);
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
+
+  const toggleScreenShare = async () => {
+    if (isScreenSharing) {
+      stopScreenShare();
+      setIsScreenSharing(false);
+      // Switch back to camera stream
+      if (stream) {
+        setPlayers((prev) => ({
+          ...prev,
+          [myId]: {
+            url: stream,
+            muted: playerHighlighted?.muted || true,
+            playing: playerHighlighted?.playing || true,
+          },
+        }));
+      }
+    } else {
+      const screenStream = await startScreenShare();
+      if (screenStream) {
+        setIsScreenSharing(true);
+        setPlayers((prev) => ({
+          ...prev,
+          [myId]: {
+            url: screenStream,
+            muted: playerHighlighted?.muted || true,
+            playing: true,
+          },
+        }));
+
+        // Update other peers with the new screen stream
+        Object.keys(users).forEach(userId => {
+          const call = peer.call(userId, screenStream);
+          call.on("stream", (incomingStream) => {
+            setPlayers(prev => ({
+              ...prev,
+              [userId]: {
+                url: incomingStream,
+                muted: true,
+                playing: true,
+              },
+            }));
+          });
+        });
+      }
+    }
+  };
 
   useEffect(() => {
     if (!socket || !peer || !stream) return;
@@ -142,11 +189,12 @@ const Room = () => {
             muted={playerHighlighted.muted}
             playing={playerHighlighted.playing}
             isActive
+            isScreenShare={isScreenSharing}
           />
         )}
       </div>
 
-      <div className="absolute top-20 right-5 flex flex-col overflow-y-auto space-y-4">
+      <div className="absolute top-20 right-5 flex flex-col overflow-y-auto space-y-4 max-h-[calc(100vh-12rem-100px)]">
         {Object.keys(nonHighlightedPlayers).map((playerId) => {
           const { url, muted, playing } = nonHighlightedPlayers[playerId];
           return (
@@ -170,6 +218,8 @@ const Room = () => {
           toggleAudio={toggleAudio}
           toggleVideo={toggleVideo}
           leaveRoom={leaveRoom}
+          isScreenSharing={isScreenSharing}
+          toggleScreenShare={toggleScreenShare}
         />
       </div>
     </div>

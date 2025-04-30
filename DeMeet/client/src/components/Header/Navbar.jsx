@@ -4,6 +4,8 @@ import {
   Settings,
   User2,
   LogOut,
+  LogIn,
+  UserPlus,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -15,10 +17,18 @@ import { Button } from "../ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import useAuthStore from "@/store/authStore";
 
 export default function Navbar() {
-  const{logout, user} = useAuth();
+  const { logout } = useAuth();
+  const { isAuthenticated, user } = useAuthStore();
   const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
+
   return (
     <nav className="flex border-b bg-background w-full shadow-md">
       <div className="p-2 md:p-4 md:px-6 w-full">
@@ -33,49 +43,61 @@ export default function Navbar() {
               src="/logo_dark.png"
               alt="DeMeet"
               className="w-12 object-cover hidden dark:block"
-            />{" "}
+            />
             <a href="/" className="text-xl font-semibold">
               DeMeet
             </a>
           </div>
 
-          <div className="flex gap-4 sm:gap-8">
-            <div className="flex items-center gap-4 sm:gap-8">
-              <Button
-                variant="outline"
-                className=""
-                onClick={() => navigate("/dashboard")}
-              >
-                DashBoard
-              </Button>
-              <BellRing className="h-[1.2rem] w-[1.2rem]" />
-              <ModeToggle />
-              {user ? (
+          <div className="flex items-center gap-4">
+            <ModeToggle />
+            
+            {isAuthenticated ? (
+              <>
+                <Button variant="ghost" size="icon">
+                  <BellRing className="h-5 w-5" />
+                </Button>
                 <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <CircleUser className="h-[1.2rem] w-[1.2rem]" />
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <CircleUser className="h-5 w-5" />
+                    </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem>
-                      <User2 className="w-4 h-4 sm:w-6 sm:h-6" />
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => navigate("/profile")}>
+                      <User2 className="mr-2 h-4 w-4" />
                       Profile
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Settings className="w-4 h-4 sm:w-6 sm:h-6" />
+                    <DropdownMenuItem onClick={() => navigate("/settings")}>
+                      <Settings className="mr-2 h-4 w-4" />
                       Settings
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={logout}>
-                      <LogOut className="w-4 h-4 sm:w-6 sm:h-6" />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
                       Logout
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              ) : (
-                <Button variant="default" onClick={() => navigate("/signup")}>
-                  Sign In
+              </>
+            ) : (
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => navigate("/login")}
+                  className="flex items-center gap-2"
+                >
+                  <LogIn className="h-4 w-4" />
+                  Login
                 </Button>
-              )}
-            </div>
+                <Button
+                  onClick={() => navigate("/signup")}
+                  className="flex items-center gap-2"
+                >
+                  <UserPlus className="h-4 w-4" />
+                  Sign Up
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

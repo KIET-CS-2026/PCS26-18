@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 const useMediaStream = () => {
   const [state, setState] = useState(null);
+  const [screenStream, setScreenStream] = useState(null);
   const isStreamSet = useRef(false);
 
   useEffect(() => {
@@ -21,8 +22,40 @@ const useMediaStream = () => {
     })();
   }, []);
 
+  const startScreenShare = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: {
+          cursor: "always"
+        },
+        audio: true
+      });
+
+      // Handle when user stops sharing through browser UI
+      stream.getVideoTracks()[0].onended = () => {
+        stopScreenShare();
+      };
+
+      setScreenStream(stream);
+      return stream;
+    } catch (e) {
+      console.log("Error in screen sharing", e);
+      return null;
+    }
+  };
+
+  const stopScreenShare = () => {
+    if (screenStream) {
+      screenStream.getTracks().forEach(track => track.stop());
+      setScreenStream(null);
+    }
+  };
+
   return {
     stream: state,
+    screenStream,
+    startScreenShare,
+    stopScreenShare,
   };
 };
 

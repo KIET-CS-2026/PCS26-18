@@ -3,22 +3,24 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useAuthQuery } from "../hooks/useAuthQuery";
 import PropTypes from "prop-types";
+import useAuthStore from "../store/authStore";
 
 const AuthRoute = ({ children }) => {
   const { user } = useAuth();
+  const { isAuthenticated } = useAuthStore();
   const { isLoading } = useAuthQuery();
   const location = useLocation();
 
   if (isLoading) {
     return (
       <div className="w-full h-full flex justify-center items-center">
-        Loading...
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  // If user is authenticated, redirect to home or the page they came from
-  if (user && location.pathname !== "/dashboard") {
+  // If user is authenticated, redirect to dashboard
+  if (isAuthenticated && user) {
     return <Navigate to="/dashboard" replace />;
   }
 

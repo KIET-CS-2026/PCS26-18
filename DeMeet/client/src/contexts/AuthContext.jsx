@@ -1,37 +1,44 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext } from "react";
 import PropTypes from "prop-types";
 import { useQueryClient } from "@tanstack/react-query";
 import api from "../lib/axios";
+import useAuthStore from "../store/authStore";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
   const queryClient = useQueryClient();
+  const { user, setAuth, clearAuth } = useAuthStore();
 
   const login = async (credentials) => {
     const response = await api.post("/users/login", credentials);
-    setUser(response.data.data.user);
+    const { user, accessToken, refreshToken } = response.data.data;
+    setAuth(user, accessToken, refreshToken);
     return response.data;
   };
 
   const logout = async () => {
-    await api.post("/users/logout");
-    setUser(null);
-    queryClient.clear(); // Clear all React Query caches
-    window.location.reload(); // Reload the page to clear all context
+    try {
+      await api.post("/users/logout");
+    } finally {
+      clearAuth();
+      queryClient.clear();
+      window.location.reload();
+    }
   };
 
   const checkAuth = async () => {
     try {
-      const response = await api.get("/users/me"); // You'll need to create this endpoint
-      setUser(response.data.data.user);
+      const response = await api.get("/users/me");
+      const { user } = response.data.data;
+      setAuth(user, null, null); // We don't need to set tokens here as they're in cookies
       return response.data;
     } catch (error) {
-      setUser(null);
+      clearAuth();
       throw error;
     }
   };
+
   return (
     <AuthContext.Provider value={{ user, login, logout, checkAuth }}>
       {children}
