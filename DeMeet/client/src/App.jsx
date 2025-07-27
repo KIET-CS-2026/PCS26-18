@@ -10,6 +10,29 @@ import AuthRoute from "./components/AuthRoute";
 import Footer from "./components/Footer/Footer";
 import Room from "./pages/Room";
 import { Toaster } from "sonner";
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import {
+  ConnectionProvider,
+  WalletProvider,
+} from "@solana/wallet-adapter-react";
+import {
+  // GlowWalletAdaptor,
+  PhantomWalletAdapter,
+  SolflareWalletAdapter,
+  // SlopeWalletAdaptor,
+  // TorusWalletAdaptor
+} from "@solana/wallet-adapter-wallets";
+import React, { useMemo } from "react";
+import {
+  WalletModalProvider,
+  WalletMultiButton,
+} from "@solana/wallet-adapter-react-ui";
+
+import "@solana/wallet-adapter-react-ui/styles.css";
+
+const network = WalletAdapterNetwork.Devnet;
+
+const wallets = [new PhantomWalletAdapter(), new SolflareWalletAdapter()];
 
 function App() {
   return (
@@ -69,3 +92,25 @@ function App() {
 }
 
 export default App;
+
+const Context = ({ children }) => {
+  const endpoint = "https://api.devnet.solana.com";
+  const wallets = useMemo(() => {
+    return [new PhantomWalletAdapter(), new SolflareWalletAdapter()];
+  }, []);
+  return (
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>{children}</WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
+  );
+};
+
+const Content = () => {
+  return (
+    <div className="App">
+      <WalletMultiButton />
+    </div>
+  );
+};
