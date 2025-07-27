@@ -21,11 +21,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { Alert } from "../ui/alert";
-import { useAuth } from "../../contexts/AuthContext";
+// import { useAuth } from "../../contexts/AuthContext";
+// import { useWallet } from "@solana/wallet-adapter-react";
+// import { toast } from "sonner";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  // const { login, loginWithSolana } = useAuth();
+  // const { publicKey, signMessage } = useWallet();
 
   const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -53,6 +57,32 @@ const LoginForm = () => {
   const handleSubmit = (data) => {
     mutate(data);
   };
+
+  // const handleSolanaLogin = async () => {
+  //   try {
+  //     if (!publicKey || !signMessage) {
+  //       toast.error("Wallet not connected or signing not supported");
+  //       return;
+  //     }
+
+  //     const base58PublicKey = publicKey.toBase58();
+  //     const message = `Login to your account - ${base58PublicKey} - ${Date.now()}`;
+  //     const encodedMessage = new TextEncoder().encode(message);
+  //     const signature = await signMessage(encodedMessage);
+  //     const signatureArr = Array.from(signature);
+
+  //     await loginWithSolana({
+  //       publicKey: base58PublicKey,
+  //       message,
+  //       signature: signatureArr,
+  //     });
+
+  //     toast.success("Logged in with wallet");
+  //     navigate("/dashboard");
+  //   } catch (err) {
+  //     toast.error("Solana login failed");
+  //   }
+  // };
 
   return (
     <Card className="w-full max-w-md">
@@ -131,14 +161,27 @@ const LoginForm = () => {
           </div>
         </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          disabled={isLoading}
-        >
-          Login with Google
-        </Button>
+        <div className="flex flex-col gap-2">
+          {/* <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={handleSolanaLogin}
+            disabled={isLoading}
+          >
+            Login with Solana Wallet
+          </Button> */}
+          <WalletMultiButton />
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={isLoading}
+          >
+            Login with Google
+          </Button>
+        </div>
       </CardContent>
       <CardFooter className="flex justify-center">
         <p className="text-sm text-gray-600">
