@@ -30,10 +30,6 @@ import {
 
 import "@solana/wallet-adapter-react-ui/styles.css";
 
-const network = WalletAdapterNetwork.Devnet;
-
-const wallets = [new PhantomWalletAdapter(), new SolflareWalletAdapter()];
-
 function App() {
   return (
     <div className="flex flex-col h-screen">
@@ -44,6 +40,7 @@ function App() {
         {/* Main content area - scrollable */}
         <div className="flex-1 overflow-hidden">
           <main className="h-full overflow-y-auto scrollbar-thin">
+            <Context>
             <div className="container mx-auto p-4 min-h-full flex items-center justify-center">
               <Routes>
                 <Route
@@ -81,6 +78,7 @@ function App() {
                 <Route path="/room/:roomId" element={<Room />} />
               </Routes>
             </div>
+            </Context>
           </main>
         </div>
 
@@ -107,10 +105,10 @@ const Context = ({ children }) => {
   );
 };
 
-const Content = () => {
-  return (
-    <div className="App">
-      <WalletMultiButton />
-    </div>
-  );
-};
+// const Content = () => {
+//   return (
+//     <div className="App">
+//       <WalletMultiButton />
+//     </div>
+//   );
+// };
