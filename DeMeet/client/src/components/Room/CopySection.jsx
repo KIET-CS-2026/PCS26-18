@@ -1,7 +1,7 @@
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Copy } from "lucide-react";
 import { Button } from "../ui/button";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 const CopySection = (props) => {
   const { roomId } = props;

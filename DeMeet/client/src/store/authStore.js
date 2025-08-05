@@ -1,32 +1,20 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-const useAuthStore = create(
-  persist(
-    (set) => ({
+const useAuthStore = create((set) => ({
+  user: null,
+  accessToken: null,
+  refreshToken: null,
+  setAuth: (user, accessToken) =>
+    set({
+      user,
+      accessToken,
+    }),
+  clearAuth: () =>
+    set({
       user: null,
       accessToken: null,
-      refreshToken: null,
-      isAuthenticated: false,
-      setAuth: (user, accessToken, refreshToken) => 
-        set({ 
-          user, 
-          accessToken, 
-          refreshToken, 
-          isAuthenticated: true 
-        }),
-      clearAuth: () => 
-        set({ 
-          user: null, 
-          accessToken: null, 
-          refreshToken: null, 
-          isAuthenticated: false 
-        }),
     }),
-    {
-      name: 'auth-storage',
-    }
-  )
-);
+}));
 
-export default useAuthStore; 
+export default useAuthStore;

@@ -14,7 +14,8 @@ const Room = () => {
   const socket = useSocket();
   const { roomId } = useParams(); // Access roomId from the URL
   const { peer, myId } = usePeer();
-  const { stream, screenStream, startScreenShare, stopScreenShare } = useMediaStream();
+  const { stream, screenStream, startScreenShare, stopScreenShare } =
+    useMediaStream();
   const {
     players,
     setPlayers,
@@ -57,10 +58,10 @@ const Room = () => {
         }));
 
         // Update other peers with the new screen stream
-        Object.keys(users).forEach(userId => {
+        Object.keys(users).forEach((userId) => {
           const call = peer.call(userId, screenStream);
           call.on("stream", (incomingStream) => {
-            setPlayers(prev => ({
+            setPlayers((prev) => ({
               ...prev,
               [userId]: {
                 url: incomingStream,

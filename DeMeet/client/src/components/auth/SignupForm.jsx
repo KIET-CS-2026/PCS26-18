@@ -12,12 +12,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { api } from "@/constants";
 import { Alert } from "@/components/ui/alert";
+import { useAuthService } from "@/services/user/hooks";
 
 const signupSchema = z
   .object({
@@ -37,7 +35,8 @@ const signupSchema = z
 
 export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
+  const { useRegister } = useAuthService();
+  const registerMutation = useRegister();
 
   const form = useForm({
     resolver: zodResolver(signupSchema),
@@ -50,31 +49,9 @@ export default function SignupForm() {
     },
   });
 
-  const { mutate, isLoading, error } = useMutation({
-    mutationFn: async (data) => {
-      const { confirmPassword, ...rest } = data; // Exclude confirmPassword
-      const response = await fetch(`${api}users/register`, {
-        method: "POST",
-        body: JSON.stringify(rest),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Registration failed");
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      navigate("/login");
-    },
-  });
-
   function onSubmit(data) {
-    mutate(data);
+    const { confirmPassword, ...rest } = data;
+    registerMutation.mutate(rest);
   }
 
   return (
@@ -83,9 +60,10 @@ export default function SignupForm() {
         <CardTitle className="text-2xl">Register</CardTitle>
       </CardHeader>
       <CardContent>
-        {error && (
+        {registerMutation.error && (
           <Alert variant="destructive" className="mb-4">
-            {error.message}
+            {registerMutation.error.response?.data?.message ||
+              "Registration failed"}
           </Alert>
         )}
         <Form {...form}>
@@ -104,87 +82,87 @@ export default function SignupForm() {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="Enter your email"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="phoneNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your phone number" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <div className="relative">
+            <div className="grid grid-cols-2 gap-2">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
                       <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter your password"
+                        type="email"
+                        placeholder="Enter your email"
                         {...field}
                       />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Confirm your password"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="phoneNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your phone number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter your password"
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Confirm your password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -200,8 +178,12 @@ export default function SignupForm() {
               )}
             />
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Registering..." : "Register"}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={registerMutation.isPending}
+            >
+              {registerMutation.isPending ? "Registering..." : "Register"}
             </Button>
 
             <div className="text-center text-sm">
@@ -210,6 +192,7 @@ export default function SignupForm() {
                 variant="link"
                 className="p-0 font-normal"
                 onClick={() => navigate("/login")}
+                disabled={registerMutation.isPending}
               >
                 Login
               </Button>

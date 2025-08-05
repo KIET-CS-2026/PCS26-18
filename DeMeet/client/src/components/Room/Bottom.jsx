@@ -4,7 +4,15 @@ import PropTypes from "prop-types";
 import { cn } from "@/lib/utils";
 
 const Bottom = (props) => {
-  const { muted, playing, toggleAudio, toggleVideo, leaveRoom, isScreenSharing, toggleScreenShare } = props;
+  const {
+    muted,
+    playing,
+    toggleAudio,
+    toggleVideo,
+    leaveRoom,
+    isScreenSharing,
+    toggleScreenShare,
+  } = props;
 
   return (
     <div className="absolute flex justify-between bottom-5 left-0 right-0 mx-auto w-[400px]">
@@ -13,7 +21,9 @@ const Bottom = (props) => {
         size="icon"
         className={cn(
           "h-14 w-14 rounded-full",
-          muted ? "bg-destructive hover:bg-destructive/90" : "bg-background hover:bg-background/90"
+          muted
+            ? "bg-destructive hover:bg-destructive/90"
+            : "bg-background hover:bg-background/90"
         )}
         onClick={toggleAudio}
       >
@@ -24,18 +34,26 @@ const Bottom = (props) => {
         size="icon"
         className={cn(
           "h-14 w-14 rounded-full",
-          playing ? "bg-destructive hover:bg-destructive/90" : "bg-background hover:bg-background/90"
+          playing
+            ? "bg-destructive hover:bg-destructive/90"
+            : "bg-background hover:bg-background/90"
         )}
         onClick={toggleVideo}
       >
-        {playing ? <Video className="h-7 w-7" /> : <VideoOff className="h-7 w-7" />}
+        {playing ? (
+          <Video className="h-7 w-7" />
+        ) : (
+          <VideoOff className="h-7 w-7" />
+        )}
       </Button>
       <Button
         variant="outline"
         size="icon"
         className={cn(
           "h-14 w-14 rounded-full",
-          isScreenSharing ? "bg-destructive hover:bg-destructive/90" : "bg-background hover:bg-background/90"
+          isScreenSharing
+            ? "bg-destructive hover:bg-destructive/90"
+            : "bg-background hover:bg-background/90"
         )}
         onClick={toggleScreenShare}
       >
