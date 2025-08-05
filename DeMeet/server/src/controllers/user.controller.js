@@ -20,8 +20,6 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     );
 });
 
-
-
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password, phoneNumber } = req.validatedData;
 
@@ -52,30 +50,34 @@ const registerUser = asyncHandler(async (req, res) => {
 
   return res
     .status(HTTP_STATUS.CREATED)
-    .json(new apiResponse(HTTP_STATUS.CREATED, user, "User registered successfully"));
+    .json(
+      new apiResponse(HTTP_STATUS.CREATED, user, "User registered successfully")
+    );
 });
 
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.validatedData;
   const user = await UserService.findByEmail(email);
-  
+
   if (!user) {
     throw new apiError(HTTP_STATUS.UNAUTHORIZED, ERROR_MESSAGES.USER_NOT_FOUND);
   }
 
   const isPasswordValid = await user.isPasswordCorrect(password);
   if (!isPasswordValid) {
-    throw new apiError(HTTP_STATUS.UNAUTHORIZED, ERROR_MESSAGES.INVALID_CREDENTIALS);
+    throw new apiError(
+      HTTP_STATUS.UNAUTHORIZED,
+      ERROR_MESSAGES.INVALID_CREDENTIALS
+    );
   }
 
-  const { accessToken, refreshToken } = await UserService.generateTokens(user._id);
+  const { accessToken, refreshToken } = await UserService.generateTokens(
+    user._id
+  );
   const loggedInUser = await UserService.findById(user._id);
 
   if (!loggedInUser) {
-    throw new apiError(
-      HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      "Login failed"
-    );
+    throw new apiError(HTTP_STATUS.INTERNAL_SERVER_ERROR, "Login failed");
   }
 
   logger.info(`User logged in successfully with ID: ${user._id}`);
@@ -94,7 +96,8 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-  const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
+  const incomingRefreshToken =
+    req.cookies.refreshToken || req.body.refreshToken;
 
   if (!incomingRefreshToken) {
     throw new apiError(HTTP_STATUS.UNAUTHORIZED, ERROR_MESSAGES.UNAUTHORIZED);
@@ -108,11 +111,17 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const user = await UserService.findById(decodedToken?._id);
     if (!user) {
-      throw new apiError(HTTP_STATUS.UNAUTHORIZED, ERROR_MESSAGES.TOKEN_EXPIRED);
+      throw new apiError(
+        HTTP_STATUS.UNAUTHORIZED,
+        ERROR_MESSAGES.TOKEN_EXPIRED
+      );
     }
 
     if (incomingRefreshToken !== user?.refreshToken) {
-      throw new apiError(HTTP_STATUS.UNAUTHORIZED, ERROR_MESSAGES.TOKEN_EXPIRED);
+      throw new apiError(
+        HTTP_STATUS.UNAUTHORIZED,
+        ERROR_MESSAGES.TOKEN_EXPIRED
+      );
     }
 
     const { accessToken, refreshToken: newRefreshToken } =
@@ -138,7 +147,15 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-  await UserService.clearRefreshToken(req.user._id);
+  const token =
+    req.cookies?.accessToken ||
+    req.header("Authorization")?.replace("Bearer ", "");
+  if (token) {
+    const decodedToken = jwt.verify(token, config.jwt.accessTokenSecret);
+    if (decodedToken?._id) {
+      await UserService.clearRefreshToken(decodedToken._id);
+    }
+  }
 
   return res
     .status(HTTP_STATUS.OK)

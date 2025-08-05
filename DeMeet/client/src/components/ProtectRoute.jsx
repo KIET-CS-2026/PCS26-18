@@ -1,16 +1,14 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { useAuthQuery } from "../hooks/useAuthQuery";
 import PropTypes from "prop-types";
 import useAuthStore from "../store/authStore";
 
-const ProtectRoute = ({ children, roles = [], isPublic = false }) => {
+const ProtectRoute = ({ children, isPublic = false }) => {
   const { user } = useAuth();
   const { isAuthenticated } = useAuthStore();
   const { isLoading, isError } = useAuthQuery();
   const location = useLocation();
 
-  // For public routes, don't check authentication
   if (isPublic) {
     return children;
   }
@@ -25,11 +23,6 @@ const ProtectRoute = ({ children, roles = [], isPublic = false }) => {
 
   if (isError || !user || !isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  // Check if user has required roles
-  if (roles.length > 0 && !roles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
   }
 
   return children;

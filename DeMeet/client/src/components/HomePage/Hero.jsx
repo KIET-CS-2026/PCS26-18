@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function Hero() {
   const navigate = useNavigate();
-  const { user } = useAuth(); 
+  const { user } = useAuth();
   return (
     <div className="flex flex-col gap-8 lg:flex-row items-center justify-center p-4 md:p-12">
       <div className="flex flex-col gap-4">

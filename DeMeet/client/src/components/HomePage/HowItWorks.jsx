@@ -33,10 +33,7 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section
-      id="how-it-works"
-      className="w-full py-12 px-8 md:py-24 lg:px-16"
-    >
+    <section id="how-it-works" className="w-full py-12 px-8 md:py-24 lg:px-16">
       <div className="container px-4 md:px-6">
         <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-16">
           How It Works

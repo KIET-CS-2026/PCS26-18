@@ -16,17 +16,17 @@ import {
 import { Button } from "../ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import useAuthStore from "@/store/authStore";
+import { useAuthService, useLogout } from "@/hooks/useAuth";
 
 export default function Navbar() {
-  const { logout } = useAuth();
   const { isAuthenticated, user } = useAuthStore();
   const navigate = useNavigate();
+  const { useLogout } = useAuthService();
+  const logoutMutation = useLogout();
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
+  const handleLogout = () => {
+    logoutMutation.mutate();
   };
 
   return (
@@ -51,7 +51,7 @@ export default function Navbar() {
 
           <div className="flex items-center gap-4">
             <ModeToggle />
-            
+
             {isAuthenticated ? (
               <>
                 <Button variant="ghost" size="icon">

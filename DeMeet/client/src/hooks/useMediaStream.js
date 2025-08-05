@@ -26,9 +26,9 @@ const useMediaStream = () => {
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({
         video: {
-          cursor: "always"
+          cursor: "always",
         },
-        audio: true
+        audio: true,
       });
 
       // Handle when user stops sharing through browser UI
@@ -46,7 +46,7 @@ const useMediaStream = () => {
 
   const stopScreenShare = () => {
     if (screenStream) {
-      screenStream.getTracks().forEach(track => track.stop());
+      screenStream.getTracks().forEach((track) => track.stop());
       setScreenStream(null);
     }
   };

@@ -1,4 +1,3 @@
-// src/components/AuthRoute.jsx
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useAuthQuery } from "../hooks/useAuthQuery";
@@ -9,7 +8,6 @@ const AuthRoute = ({ children }) => {
   const { user } = useAuth();
   const { isAuthenticated } = useAuthStore();
   const { isLoading } = useAuthQuery();
-  const location = useLocation();
 
   if (isLoading) {
     return (

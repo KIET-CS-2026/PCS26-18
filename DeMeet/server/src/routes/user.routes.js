@@ -22,9 +22,9 @@ userRouter
   );
 userRouter.route("/login").post(validate(loginSchema), loginUser);
 userRouter.route("/refreshAccess").post(refreshAccessToken);
+userRouter.route("/logout").post(logoutUser);
 
 //Secured Routes
 userRouter.route("/me").get(verifyJWT, getCurrentUser);
-userRouter.route("/logout").post(verifyJWT, logoutUser);
 
 export default userRouter;

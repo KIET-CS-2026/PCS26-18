@@ -18,14 +18,13 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Alert } from "../ui/alert";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuthService, useLogin } from "../../hooks/useAuth";
 
 const LoginForm = () => {
-  const navigate = useNavigate();
-  const { login } = useAuth();
+  const { useLogin } = useAuthService();
+  const loginMutation = useLogin();
 
   const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -40,18 +39,8 @@ const LoginForm = () => {
     },
   });
 
-  const { mutate, isLoading, error } = useMutation({
-    mutationFn: async (data) => {
-      return await login(data);
-    },
-    onSuccess: () => {
-      // Navigate to the page user tried to visit before being redirected to login
-      navigate("/dashboard");
-    },
-  });
-
   const handleSubmit = (data) => {
-    mutate(data);
+    loginMutation.mutate(data);
   };
 
   return (
@@ -60,9 +49,9 @@ const LoginForm = () => {
         <CardTitle className="text-2xl text-center">Login</CardTitle>
       </CardHeader>
       <CardContent>
-        {error && (
+        {loginMutation.error && (
           <Alert variant="destructive" className="mb-4">
-            {error.message}
+            {loginMutation.error.response?.data?.message || "Login failed"}
           </Alert>
         )}
         <Form {...form}>
@@ -80,7 +69,7 @@ const LoginForm = () => {
                     <Input
                       placeholder="Enter your email"
                       {...field}
-                      disabled={isLoading}
+                      disabled={loginMutation.isPending}
                       autoComplete="email"
                     />
                   </FormControl>
@@ -99,7 +88,7 @@ const LoginForm = () => {
                       type="password"
                       placeholder="Enter your password"
                       {...field}
-                      disabled={isLoading}
+                      disabled={loginMutation.isPending}
                       autoComplete="current-password"
                     />
                   </FormControl>
@@ -114,8 +103,12 @@ const LoginForm = () => {
                 </Button>
               </Link>
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Logging in..." : "Login"}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loginMutation.isPending}
+            >
+              {loginMutation.isPending ? "Logging in..." : "Login"}
             </Button>
           </form>
         </Form>
@@ -135,7 +128,7 @@ const LoginForm = () => {
           type="button"
           variant="outline"
           className="w-full"
-          disabled={isLoading}
+          disabled={loginMutation.isPending}
         >
           Login with Google
         </Button>

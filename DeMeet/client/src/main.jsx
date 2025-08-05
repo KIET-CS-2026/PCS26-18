@@ -4,17 +4,14 @@ import "./index.css";
 import App from "./App.jsx";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import QueryProvider from "./QueryProvider";
-import { AuthProvider } from "./contexts/AuthContext";
 import { SocketProvider } from "./contexts/Socket";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <QueryProvider>
-        <AuthProvider>
-          <SocketProvider>
-            <App />
-          </SocketProvider>
-        </AuthProvider>
+        <SocketProvider>
+          <App />
+        </SocketProvider>
       </QueryProvider>
     </ThemeProvider>
   </StrictMode>
