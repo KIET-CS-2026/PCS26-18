@@ -40,7 +40,10 @@ export class UserService {
     try {
       const user = await User.findById(userId);
       if (!user) {
-        throw new apiError(HTTP_STATUS.NOT_FOUND, ERROR_MESSAGES.USER_NOT_FOUND);
+        throw new apiError(
+          HTTP_STATUS.NOT_FOUND,
+          ERROR_MESSAGES.USER_NOT_FOUND
+        );
       }
 
       const accessToken = user.generateAccessToken();

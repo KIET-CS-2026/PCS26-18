@@ -8,11 +8,11 @@ import {
 import { ChevronDown, Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import useAuthStore from "@/store/authStore";
 
 export default function Hero() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   return (
     <div className="flex flex-col gap-8 lg:flex-row items-center justify-center p-4 md:p-12">
       <div className="flex flex-col gap-4">
@@ -44,7 +44,7 @@ export default function Hero() {
               Go to Dashboard
             </Button>
           ) : (
-            <Button onClick={() => navigate("/signup")}>Sign in</Button>
+            <Button onClick={() => navigate("/signup")}>Sign up</Button>
           )}
 
           <DropdownMenu>

@@ -70,11 +70,9 @@ userSchema.methods.generateAccessToken = function () {
 };
 
 userSchema.methods.generateRefreshToken = function () {
-  return jwt.sign(
-    { _id: this._id },
-    config.jwt.refreshTokenSecret,
-    { expiresIn: config.jwt.refreshTokenExpiry }
-  );
+  return jwt.sign({ _id: this._id }, config.jwt.refreshTokenSecret, {
+    expiresIn: config.jwt.refreshTokenExpiry,
+  });
 };
 
 export const User = mongoose.model("User", userSchema);

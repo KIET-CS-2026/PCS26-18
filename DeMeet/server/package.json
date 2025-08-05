@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "api": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
-    "video": "nodemon -r dotenv/config --experimental-json-modules src/socket.js"
+    "video": "nodemon -r dotenv/config --experimental-json-modules src/socket.js",
+    "format": "prettier --write ."
   },
   "author": "Yashasvi Saxena",
   "license": "ISC",

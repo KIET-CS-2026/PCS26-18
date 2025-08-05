@@ -20,7 +20,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
 import { Alert } from "../ui/alert";
-import { useAuthService, useLogin } from "../../hooks/useAuth";
+import { useAuthService } from "@/services/user/hooks";
 
 const LoginForm = () => {
   const { useLogin } = useAuthService();

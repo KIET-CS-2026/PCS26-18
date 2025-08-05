@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import apiError from "../utils/apiError.js";
 import apiResponse from "../utils/apiResponse.js";
 import logger from "../utils/logger.js";
-import * as jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { config } from "../config/index.js";
 import { HTTP_STATUS, ERROR_MESSAGES } from "../constants/httpStatus.js";
 import { UserService } from "../services/user.service.js";

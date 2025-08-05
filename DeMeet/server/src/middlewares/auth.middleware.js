@@ -22,7 +22,10 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
     );
 
     if (!user) {
-      throw new apiError(HTTP_STATUS.UNAUTHORIZED, ERROR_MESSAGES.TOKEN_EXPIRED);
+      throw new apiError(
+        HTTP_STATUS.UNAUTHORIZED,
+        ERROR_MESSAGES.TOKEN_EXPIRED
+      );
     }
 
     req.user = user;

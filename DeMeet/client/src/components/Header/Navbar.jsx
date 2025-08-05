@@ -17,7 +17,7 @@ import { Button } from "../ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "@/store/authStore";
-import { useAuthService, useLogout } from "@/hooks/useAuth";
+import { useAuthService } from "@/services/user/hooks";
 
 export default function Navbar() {
   const { isAuthenticated, user } = useAuthStore();
