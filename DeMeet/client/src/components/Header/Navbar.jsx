@@ -20,7 +20,7 @@ import useAuthStore from "@/store/authStore";
 import { useAuthService } from "@/services/user/hooks";
 
 export default function Navbar() {
-  const { isAuthenticated, user } = useAuthStore();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
   const { useLogout } = useAuthService();
   const logoutMutation = useLogout();
@@ -52,7 +52,7 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             <ModeToggle />
 
-            {isAuthenticated ? (
+            {user ? (
               <>
                 <Button variant="ghost" size="icon">
                   <BellRing className="h-5 w-5" />

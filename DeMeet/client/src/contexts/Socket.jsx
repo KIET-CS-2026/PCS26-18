@@ -13,7 +13,7 @@ export const SocketProvider = ({ children }) => {
     const connection = io("http://localhost:5000", {
       transports: ["websocket"],
     }); // Adjust if hosted
-    console.log("Socket connected", connection);
+    // console.log("Socket connected", connection);
     setSocket(connection);
 
     connection.on("connect_error", (err) => {

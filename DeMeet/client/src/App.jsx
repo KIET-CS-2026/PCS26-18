@@ -23,7 +23,14 @@ function App() {
           <main className="h-full overflow-y-auto scrollbar-thin">
             <div className="container mx-auto p-4 min-h-full flex items-center justify-center">
               <Routes>
-                <Route path="/" element={<LandingPage />} />
+                <Route
+                  path="/"
+                  element={
+                    <ProtectRoute isPublic>
+                      <LandingPage />
+                    </ProtectRoute>
+                  }
+                />
                 <Route
                   path="login"
                   element={

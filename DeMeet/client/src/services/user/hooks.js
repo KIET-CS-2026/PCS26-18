@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 export function useAuthService() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { setAuth, clearAuth, isAuthenticated } = useAuthStore();
+  const { setAuth, clearAuth } = useAuthStore();
 
   const useLogin = () => {
     return useMutation({
@@ -58,17 +58,21 @@ export function useAuthService() {
   const useCurrentUser = () => {
     return useQuery({
       queryKey: ["currentUser"],
-      queryFn: authAPI.getCurrentUser,
-      enabled: isAuthenticated,
+      queryFn: () => {
+        authAPI
+          .getCurrentUser()
+          .then((response) => {
+            const { user } = response.data.data;
+            setAuth(user, null);
+          })
+          .catch((error) => {
+            toast.error(
+              error.response?.data?.message || "Failed to fetch user data"
+            );
+          });
+      },
       retry: false,
       staleTime: 1000 * 60 * 5,
-      onSuccess: (response) => {
-        const { user } = response.data.data;
-        useAuthStore.getState().setAuth(user, null, null);
-      },
-      onError: () => {
-        useAuthStore.getState().clearAuth();
-      },
     });
   };
 

@@ -6,7 +6,7 @@ const AuthRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
   // If user is authenticated, redirect to dashboard
-  if (isAuthenticated && user) {
+  if (user) {
     return <Navigate to="/dashboard" replace />;
   }
 
