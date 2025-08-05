@@ -4,17 +4,11 @@ import cookieParser from "cookie-parser";
 import logger from "./utils/logger.js";
 import morgan from "morgan";
 import errorHandler from "./middlewares/error.middleware.js";
+import { config } from "./config/index.js";
+
 const app = express();
 
-app.use(
-  cors({
-    origin:
-      process.env.ENVIRONMENT === "dev"
-        ? "http://localhost:5173" // Your frontend URL in development
-        : "https://yourproductionurl.com",
-    credentials: true,
-  })
-);
+app.use(cors(config.cors));
 
 const morganFormat = ":method :url :status :response-time ms";
 
@@ -43,10 +37,11 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 //routes import
-
 import userRouter from "./routes/user.routes.js";
+import healthRouter from "./routes/health.routes.js";
 
 //routes declaration
+app.use("/api/health", healthRouter);
 app.use("/api/users", userRouter);
 
 app.use(errorHandler);

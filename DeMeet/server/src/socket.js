@@ -1,20 +1,23 @@
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
+import { config } from "./config/index.js";
+import logger from "./utils/logger.js";
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // Adjust this based on your frontend URL
+    origin: config.cors.origin,
     methods: ["GET", "POST"],
   },
 });
 
-io.on("connection", (socket) => {
-  console.log("A user connected:", socket.id);
+const handleSocketConnection = (socket) => {
+  logger.info(`User connected: ${socket.id}`);
 
   socket.on("join-room", (roomId, userId) => {
-    console.log(`User ${userId} joined room ${roomId}`);
+    logger.info(`User ${userId} joined room ${roomId}`);
     socket.join(roomId);
     socket.broadcast.to(roomId).emit("user-connected", userId);
   });
@@ -28,17 +31,18 @@ io.on("connection", (socket) => {
   });
 
   socket.on("user-leave", (userId, roomId) => {
-    console.log(`User ${userId} left room ${roomId}`);
+    logger.info(`User ${userId} left room ${roomId}`);
     socket.leave(roomId);
     socket.broadcast.to(roomId).emit("user-leave", userId);
   });
 
   socket.on("disconnect", () => {
-    console.log("A user disconnected");
+    logger.info(`User disconnected: ${socket.id}`);
   });
-});
+};
 
-const PORT = process.env.PORT2 || 5000;
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+io.on("connection", handleSocketConnection);
+
+server.listen(config.socketPort, () => {
+  logger.info(`Socket server is running on port ${config.socketPort}`);
 });

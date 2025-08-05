@@ -1,209 +1,150 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import apiError from "../utils/apiError.js";
-import { User } from "../models/user.model.js";
-import { uploadToCloudinary } from "../utils/cloudinary.js";
 import apiResponse from "../utils/apiResponse.js";
-import { z } from "zod";
 import logger from "../utils/logger.js";
 import * as jwt from "jsonwebtoken";
-
-const options = {
-  httpOnly: true, // Should be true in both dev and prod
-  secure: process.env.ENVIRONMENT === "prod", // false in dev, true in prod
-  sameSite: "lax", // "lax" is more appropriate for dev
-  path: "/",
-  maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days in milliseconds
-};
+import { config } from "../config/index.js";
+import { HTTP_STATUS, ERROR_MESSAGES } from "../constants/httpStatus.js";
+import { UserService } from "../services/user.service.js";
+import { UploadService } from "../services/upload.service.js";
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-  // req.user is already available from verifyJWT middleware
-  // and it already excludes password and refreshToken
   return res
-    .status(200)
+    .status(HTTP_STATUS.OK)
     .json(
       new apiResponse(
-        200,
+        HTTP_STATUS.OK,
         { user: req.user },
         "Current user fetched successfully"
       )
     );
 });
 
-const generateAccessAndRefreshToken = async (userId) => {
-  try {
-    const user = await User.findById(userId);
-    const accessToken = user.generateAccessToken();
-    const refreshToken = user.generateRefreshToken();
 
-    user.refreshToken = refreshToken;
-    await user.save({ validateBeforeSave: false });
 
-    return { accessToken, refreshToken };
-  } catch (error) {
-    throw new apiError(
-      500,
-      "Something went wrong while generating access and refresh token"
-    );
-  }
-};
+const registerUser = asyncHandler(async (req, res) => {
+  const { name, email, password, phoneNumber } = req.validatedData;
 
-const registerUser = asyncHandler(async (req, res, next) => {
-  const userSchema = z.object({
-    name: z.string().nonempty("Name is required"),
-    email: z.string().email("Invalid email format"),
-    password: z.string().nonempty("Password is required"),
-    phoneNumber: z.string().nonempty("Phone number is required"),
-  });
-
-  const validationResult = await userSchema.safeParse(req.body);
-  if (!validationResult.success) {
-    throw new apiError(400, validationResult.error.errors[0].message);
-  }
-
-  const { name, email, password, phoneNumber } = validationResult.data;
-
-  const existedUser = await User.findOne({ $or: [{ phoneNumber }, { email }] });
+  const existedUser = await UserService.findByEmailOrPhone(email, phoneNumber);
   if (existedUser) {
-    throw new apiError(409, "User with email or phoneNumber already exist !");
+    throw new apiError(HTTP_STATUS.CONFLICT, ERROR_MESSAGES.USER_EXISTS);
   }
 
-  let avatar = null;
-  const avatarLocalPath = req.files?.avatar?.[0]?.path;
+  const avatarPath = req.files?.avatar?.[0]?.path;
+  const avatar = await UploadService.uploadAvatar(avatarPath);
 
-  if (avatarLocalPath) {
-    const uploadedAvatar = await uploadToCloudinary(avatarLocalPath);
-    if (!uploadedAvatar) {
-      throw new apiError(400, "Avatar upload error");
-    }
-    avatar = uploadedAvatar.url;
-  }
-
-  const user = await User.create({
+  const user = await UserService.createUser({
     name,
     email,
     password,
     phoneNumber,
     avatar,
   });
-  const findUser = await User.findById(user._id).select(
-    "-password -refreshToken"
-  );
-  if (!findUser)
-    throw new apiError(500, "Something went wrong while registering user");
 
-  logger.info(`User created Successfully with Id ${user._id}`);
+  if (!user) {
+    throw new apiError(
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "User registration failed"
+    );
+  }
+
+  logger.info(`User created successfully with ID: ${user._id}`);
 
   return res
-    .status(201)
-    .json(new apiResponse(201, findUser, "User Registered Successfully"));
+    .status(HTTP_STATUS.CREATED)
+    .json(new apiResponse(HTTP_STATUS.CREATED, user, "User registered successfully"));
 });
 
-const loginUser = asyncHandler(async (req, res, next) => {
-  const loginSchema = z.object({
-    email: z.string().email("Invalid email format"),
-    password: z.string().nonempty("Password is required"),
-  });
-  const validationResult = await loginSchema.safeParse(req.body);
-  if (!validationResult.success) {
-    throw new apiError(400, validationResult.error.errors[0].message);
-  }
-  const { email, password } = validationResult.data;
-  const user = await User.findOne({ email });
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.validatedData;
+  const user = await UserService.findByEmail(email);
+  
   if (!user) {
-    throw new apiError(401, "User does not exist");
+    throw new apiError(HTTP_STATUS.UNAUTHORIZED, ERROR_MESSAGES.USER_NOT_FOUND);
   }
+
   const isPasswordValid = await user.isPasswordCorrect(password);
   if (!isPasswordValid) {
-    throw new apiError(401, "Invalid user credentials");
+    throw new apiError(HTTP_STATUS.UNAUTHORIZED, ERROR_MESSAGES.INVALID_CREDENTIALS);
   }
-  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
-    user._id
-  );
 
-  const loggedInUser = await User.findById(user._id).select(
-    "-password -refreshToken"
-  );
+  const { accessToken, refreshToken } = await UserService.generateTokens(user._id);
+  const loggedInUser = await UserService.findById(user._id);
 
   if (!loggedInUser) {
-    throw new apiError(500, "Something went wrong while logging in user");
+    throw new apiError(
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "Login failed"
+    );
   }
 
-  logger.info(`User logged in Successfully with Id ${user._id}`);
+  logger.info(`User logged in successfully with ID: ${user._id}`);
 
   return res
-    .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .status(HTTP_STATUS.OK)
+    .cookie("accessToken", accessToken, config.cookie)
+    .cookie("refreshToken", refreshToken, config.cookie)
     .json(
       new apiResponse(
-        200,
+        HTTP_STATUS.OK,
         { user: loggedInUser, accessToken, refreshToken },
-        "User Logged In Successfully"
+        "User logged in successfully"
       )
     );
 });
 
-const refreshAccessToken = asyncHandler(async (req, res, next) => {
-  const incomingRefreshToken =
-    req.cookies.refreshToken || req.body.refreshToken;
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
   if (!incomingRefreshToken) {
-    throw new apiError(401, "Unauthorized request");
+    throw new apiError(HTTP_STATUS.UNAUTHORIZED, ERROR_MESSAGES.UNAUTHORIZED);
   }
 
   try {
     const decodedToken = jwt.verify(
       incomingRefreshToken,
-      process.env.REFRESH_TOKEN_SECRET
+      config.jwt.refreshTokenSecret
     );
 
-    const user = await User.findById(decodedToken?._id);
-
+    const user = await UserService.findById(decodedToken?._id);
     if (!user) {
-      throw new apiError(401, "Invalid refresh token");
+      throw new apiError(HTTP_STATUS.UNAUTHORIZED, ERROR_MESSAGES.TOKEN_EXPIRED);
     }
 
     if (incomingRefreshToken !== user?.refreshToken) {
-      throw new apiError(401, "Refresh token is expired or used");
+      throw new apiError(HTTP_STATUS.UNAUTHORIZED, ERROR_MESSAGES.TOKEN_EXPIRED);
     }
 
     const { accessToken, refreshToken: newRefreshToken } =
-      await generateAccessAndRefreshToken(user._id);
+      await UserService.generateTokens(user._id);
 
-    res
-      .status(200)
-      .cookie("accessToken", accessToken, options)
-      .cookie("refreshToken", newRefreshToken, options)
+    return res
+      .status(HTTP_STATUS.OK)
+      .cookie("accessToken", accessToken, config.cookie)
+      .cookie("refreshToken", newRefreshToken, config.cookie)
       .json(
         new apiResponse(
-          200,
+          HTTP_STATUS.OK,
           { accessToken, refreshToken: newRefreshToken },
           "Access token refreshed"
         )
       );
   } catch (error) {
-    throw new apiError(401, error?.message || "Invalid refresh token");
+    throw new apiError(
+      HTTP_STATUS.UNAUTHORIZED,
+      error?.message || ERROR_MESSAGES.TOKEN_EXPIRED
+    );
   }
 });
 
-const logoutUser = asyncHandler(async (req, res, next) => {
-  await User.findByIdAndUpdate(
-    req.user._id,
-    {
-      $unset: {
-        refreshToken: 1,
-      },
-    },
-    {
-      new: true,
-    }
-  );
+const logoutUser = asyncHandler(async (req, res) => {
+  await UserService.clearRefreshToken(req.user._id);
 
   return res
-    .status(200)
-    .clearCookie("accessToken", options)
-    .clearCookie("refreshToken", options)
-    .json(new apiResponse(200, {}, "User logged out successfully"));
+    .status(HTTP_STATUS.OK)
+    .clearCookie("accessToken", config.cookie)
+    .clearCookie("refreshToken", config.cookie)
+    .json(new apiResponse(HTTP_STATUS.OK, {}, "User logged out successfully"));
 });
 
 export {
