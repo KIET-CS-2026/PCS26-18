@@ -18,13 +18,20 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Alert } from "../ui/alert";
 import { useAuthService } from "@/services/user/hooks";
+// import { useAuth } from "../../contexts/AuthContext";
+// import { useWallet } from "@solana/wallet-adapter-react";
+// import { toast } from "sonner";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 const LoginForm = () => {
   const { useLogin } = useAuthService();
   const loginMutation = useLogin();
+  const navigate = useNavigate();
+  // const { login, loginWithSolana } = useAuth();
+  // const { publicKey, signMessage } = useWallet();
 
   const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -42,6 +49,32 @@ const LoginForm = () => {
   const handleSubmit = (data) => {
     loginMutation.mutate(data);
   };
+
+  // const handleSolanaLogin = async () => {
+  //   try {
+  //     if (!publicKey || !signMessage) {
+  //       toast.error("Wallet not connected or signing not supported");
+  //       return;
+  //     }
+
+  //     const base58PublicKey = publicKey.toBase58();
+  //     const message = `Login to your account - ${base58PublicKey} - ${Date.now()}`;
+  //     const encodedMessage = new TextEncoder().encode(message);
+  //     const signature = await signMessage(encodedMessage);
+  //     const signatureArr = Array.from(signature);
+
+  //     await loginWithSolana({
+  //       publicKey: base58PublicKey,
+  //       message,
+  //       signature: signatureArr,
+  //     });
+
+  //     toast.success("Logged in with wallet");
+  //     navigate("/dashboard");
+  //   } catch (err) {
+  //     toast.error("Solana login failed");
+  //   }
+  // };
 
   return (
     <Card className="w-full max-w-md">
@@ -123,7 +156,7 @@ const LoginForm = () => {
             </span>
           </div>
         </div>
-
+        <WalletMultiButton />
         <Button
           type="button"
           variant="outline"

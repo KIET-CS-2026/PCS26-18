@@ -10,6 +10,25 @@ import AuthRoute from "./components/AuthRoute";
 import Footer from "./components/Footer/Footer";
 import Room from "./pages/Room";
 import { Toaster } from "sonner";
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import {
+  ConnectionProvider,
+  WalletProvider,
+} from "@solana/wallet-adapter-react";
+import {
+  // GlowWalletAdaptor,
+  PhantomWalletAdapter,
+  SolflareWalletAdapter,
+  // SlopeWalletAdaptor,
+  // TorusWalletAdaptor
+} from "@solana/wallet-adapter-wallets";
+import React, { useMemo } from "react";
+import {
+  WalletModalProvider,
+  WalletMultiButton,
+} from "@solana/wallet-adapter-react-ui";
+
+import "@solana/wallet-adapter-react-ui/styles.css";
 
 function App() {
   return (
@@ -21,6 +40,7 @@ function App() {
         {/* Main content area - scrollable */}
         <div className="flex-1 overflow-hidden">
           <main className="h-full overflow-y-auto scrollbar-thin">
+            <Context>
             <div className="container mx-auto p-4 min-h-full flex items-center justify-center">
               <Routes>
                 <Route
@@ -58,6 +78,7 @@ function App() {
                 <Route path="/room/:roomId" element={<Room />} />
               </Routes>
             </div>
+            </Context>
           </main>
         </div>
 
@@ -69,3 +90,25 @@ function App() {
 }
 
 export default App;
+
+const Context = ({ children }) => {
+  const endpoint = "https://api.devnet.solana.com";
+  const wallets = useMemo(() => {
+    return [new PhantomWalletAdapter(), new SolflareWalletAdapter()];
+  }, []);
+  return (
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>{children}</WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
+  );
+};
+
+// const Content = () => {
+//   return (
+//     <div className="App">
+//       <WalletMultiButton />
+//     </div>
+//   );
+// };
