@@ -156,7 +156,9 @@ const LoginForm = () => {
             </span>
           </div>
         </div>
-        <WalletMultiButton />
+        <div className="flex justify-center mb-4">
+          <WalletMultiButton />
+        </div>
         <Button
           type="button"
           variant="outline"
