@@ -21,6 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
 import { Alert } from "../ui/alert";
 import { useAuthService } from "@/services/user/hooks";
+import GoogleSignInButton from "../GoogleSignInButton";
 // import { useAuth } from "../../contexts/AuthContext";
 // import { useWallet } from "@solana/wallet-adapter-react";
 // import { toast } from "sonner";
@@ -159,14 +160,7 @@ const LoginForm = () => {
         <div className="flex justify-center mb-4">
           <WalletMultiButton />
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          disabled={loginMutation.isPending}
-        >
-          Login with Google
-        </Button>
+        <GoogleSignInButton disabled={loginMutation.isPending} />
       </CardContent>
       <CardFooter className="flex justify-center">
         <p className="text-sm text-gray-600">

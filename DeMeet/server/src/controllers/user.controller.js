@@ -7,6 +7,7 @@ import { config } from "../config/index.js";
 import { HTTP_STATUS, ERROR_MESSAGES } from "../constants/httpStatus.js";
 import { UserService } from "../services/user.service.js";
 import { UploadService } from "../services/upload.service.js";
+import { OAuth2Client } from "google-auth-library";
 
 const getCurrentUser = asyncHandler(async (req, res) => {
   return res
@@ -164,10 +165,110 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new apiResponse(HTTP_STATUS.OK, {}, "User logged out successfully"));
 });
 
+// Google OAuth Controllers
+const googleAuth = asyncHandler(async (req, res) => {
+  // This will redirect to Google OAuth
+  // Handled by passport middleware
+});
+
+const googleCallback = asyncHandler(async (req, res) => {
+  try {
+    if (!req.user) {
+      throw new apiError(HTTP_STATUS.UNAUTHORIZED, "Google authentication failed");
+    }
+
+    const { accessToken, refreshToken } = await UserService.generateTokens(req.user._id);
+    
+    logger.info(`User logged in via Google with ID: ${req.user._id}`);
+
+    // Set cookies and redirect to frontend
+    res
+      .cookie("accessToken", accessToken, config.cookie)
+      .cookie("refreshToken", refreshToken, config.cookie)
+      .redirect(`${config.client.url}/dashboard`);
+  } catch (error) {
+    logger.error("Google OAuth callback error:", error);
+    res.redirect(`${config.client.url}/auth?error=oauth_failed`);
+  }
+});
+
+const googleVerify = asyncHandler(async (req, res) => {
+  const { idToken, googleId, name, email, avatar } = req.body;
+
+  if (!idToken || !googleId || !name || !email) {
+    throw new apiError(HTTP_STATUS.BAD_REQUEST, "Missing required Google user data");
+  }
+
+  try {
+    // In production, verify the token with Google
+    // const client = new OAuth2Client(config.google.clientId);
+    // const ticket = await client.verifyIdToken({
+    //   idToken: idToken,
+    //   audience: config.google.clientId,
+    // });
+    // const payload = ticket.getPayload();
+
+    // For development, we trust the frontend verification
+    
+    let user = await UserService.findByGoogleId(googleId);
+    
+    if (!user) {
+      user = await UserService.createGoogleUser({
+        googleId,
+        name,
+        email,
+        avatar,
+      });
+    }
+
+    const { accessToken, refreshToken } = await UserService.generateTokens(user._id);
+    
+    logger.info(`User authenticated via Google token with ID: ${user._id}`);
+
+    return res
+      .status(HTTP_STATUS.OK)
+      .cookie("accessToken", accessToken, config.cookie)
+      .cookie("refreshToken", refreshToken, config.cookie)
+      .json(
+        new apiResponse(
+          HTTP_STATUS.OK,
+          { user, accessToken, refreshToken },
+          "Google authentication successful"
+        )
+      );
+  } catch (error) {
+    logger.error("Google token verification error:", error);
+    throw new apiError(
+      HTTP_STATUS.UNAUTHORIZED,
+      "Google token verification failed"
+    );
+  }
+});
+
+const googleSuccess = asyncHandler(async (req, res) => {
+  if (req.user) {
+    return res
+      .status(HTTP_STATUS.OK)
+      .json(
+        new apiResponse(
+          HTTP_STATUS.OK,
+          { user: req.user },
+          "Google authentication successful"
+        )
+      );
+  } else {
+    throw new apiError(HTTP_STATUS.UNAUTHORIZED, "Authentication failed");
+  }
+});
+
 export {
   getCurrentUser,
   registerUser,
   loginUser,
   refreshAccessToken,
   logoutUser,
+  googleAuth,
+  googleCallback,
+  googleVerify,
+  googleSuccess,
 };

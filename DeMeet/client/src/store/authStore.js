@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
 const useAuthStore = create((set) => ({
   user: null,
@@ -10,10 +9,13 @@ const useAuthStore = create((set) => ({
       user,
       accessToken,
     }),
+  setUser: (user) => set({ user }),
+  setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
   clearAuth: () =>
     set({
       user: null,
       accessToken: null,
+      refreshToken: null,
     }),
 }));
 

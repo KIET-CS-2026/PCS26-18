@@ -11,6 +11,14 @@ export class UserService {
     return await User.findOne({ email });
   }
 
+  static async findByGoogleId(googleId) {
+    return await User.findOne({ googleId });
+  }
+
+  static async findByEmailOrGoogleId(email, googleId) {
+    return await User.findOne({ $or: [{ email }, { googleId }] });
+  }
+
   static async findById(id) {
     return await User.findById(id).select("-password -refreshToken");
   }
@@ -58,5 +66,42 @@ export class UserService {
         "Token generation failed"
       );
     }
+  }
+
+  static async createGoogleUser(googleUserData) {
+    const { googleId, name, email, avatar } = googleUserData;
+    
+    // Check if user exists with email
+    let existingUser = await this.findByEmail(email);
+    
+    if (existingUser) {
+      // Link Google account to existing user
+      existingUser.googleId = googleId;
+      existingUser.isGoogleUser = true;
+      if (!existingUser.avatar && avatar) {
+        existingUser.avatar = avatar;
+      }
+      await existingUser.save();
+      return await this.findById(existingUser._id);
+    }
+    
+    // Create new Google user
+    const user = await User.create({
+      name,
+      email,
+      googleId,
+      isGoogleUser: true,
+      avatar: avatar || undefined,
+    });
+    
+    return await this.findById(user._id);
+  }
+
+  static async linkGoogleAccount(userId, googleId) {
+    return await User.findByIdAndUpdate(
+      userId,
+      { googleId, isGoogleUser: true },
+      { new: true, validateBeforeSave: false }
+    ).select("-password -refreshToken");
   }
 }

@@ -18,8 +18,11 @@ const userSchema = new Schema(
     },
     phoneNumber: {
       type: String,
-      required: true,
+      required: function() {
+        return !this.isGoogleUser; // Only required if not a Google user
+      },
       unique: true,
+      sparse: true, // This ensures that the unique index ignores null values
     },
     walletId: {
       type: String,
@@ -28,9 +31,20 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: function() {
+        return !this.isGoogleUser; // Only required if not a Google user
+      },
       minlength: 8,
       maxlength: 20,
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true, // This ensures that the unique index ignores null values
+    },
+    isGoogleUser: {
+      type: Boolean,
+      default: false,
     },
     avatar: {
       type: String,
@@ -46,13 +60,16 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  if (this.isModified("password")) {
+  if (this.isModified("password") && this.password && !this.isGoogleUser) {
     this.password = await bcrypt.hash(this.password, 10);
   }
   next();
 });
 
 userSchema.methods.isPasswordCorrect = async function (enteredPassword) {
+  if (this.isGoogleUser) {
+    return false; // Google users don't have passwords
+  }
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
