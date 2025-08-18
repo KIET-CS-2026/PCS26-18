@@ -14,14 +14,16 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router-dom";
 import { Alert } from "@/components/ui/alert";
 import { useAuthService } from "@/services/user/hooks";
+import GoogleSignInButton from "../GoogleSignInButton";
 
 const signupSchema = z
   .object({
     name: z.string().min(1, "Name is required"),
     email: z.string().email("Invalid email address"),
-    phoneNumber: z.string().min(1, "Phone number is required"),
+    phoneNumber: z.string().optional(),
     password: z.string().min(8, "Password must be at least 6 characters"),
     confirmPassword: z
       .string()
@@ -37,6 +39,7 @@ export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const { useRegister } = useAuthService();
   const registerMutation = useRegister();
+  const navigate = useNavigate();
 
   const form = useForm({
     resolver: zodResolver(signupSchema),
@@ -50,6 +53,7 @@ export default function SignupForm() {
   });
 
   function onSubmit(data) {
+    // eslint-disable-next-line no-unused-vars
     const { confirmPassword, ...rest } = data;
     registerMutation.mutate(rest);
   }
@@ -106,7 +110,7 @@ export default function SignupForm() {
                 name="phoneNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
+                    <FormLabel>Phone Number (Optional)</FormLabel>
                     <FormControl>
                       <Input placeholder="Enter your phone number" {...field} />
                     </FormControl>
@@ -185,6 +189,19 @@ export default function SignupForm() {
             >
               {registerMutation.isPending ? "Registering..." : "Register"}
             </Button>
+
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-gray-500">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            <GoogleSignInButton disabled={registerMutation.isPending} />
 
             <div className="text-center text-sm">
               Already have an account?{" "}

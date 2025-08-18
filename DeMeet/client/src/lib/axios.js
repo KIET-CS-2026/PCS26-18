@@ -29,6 +29,10 @@ const publicRoutes = [
   "/health",
   "/users/refreshAccess",
   "/users/logout",
+  "/users/auth/google",
+  "/users/auth/google/callback",
+  "/users/auth/google/verify",
+  "/users/auth/google/success",
 ];
 
 // Request interceptor
