@@ -24,6 +24,10 @@ export class UserService {
   }
 
   static async createUser(userData) {
+    // Remove phoneNumber if it's empty or null to avoid unique constraint issues
+    if (!userData.phoneNumber) {
+      delete userData.phoneNumber;
+    }
     const user = await User.create(userData);
     return await User.findById(user._id).select("-password -refreshToken");
   }

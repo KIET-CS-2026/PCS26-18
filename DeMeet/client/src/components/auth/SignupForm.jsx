@@ -23,7 +23,7 @@ const signupSchema = z
   .object({
     name: z.string().min(1, "Name is required"),
     email: z.string().email("Invalid email address"),
-    phoneNumber: z.string().min(1, "Phone number is required"),
+    phoneNumber: z.string().optional(),
     password: z.string().min(8, "Password must be at least 6 characters"),
     confirmPassword: z
       .string()
