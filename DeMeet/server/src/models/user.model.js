@@ -18,9 +18,7 @@ const userSchema = new Schema(
     },
     phoneNumber: {
       type: String,
-      required: function() {
-        return !this.isGoogleUser; // Only required if not a Google user
-      },
+      required: false,
       unique: true,
       sparse: true, // This ensures that the unique index ignores null values
     },
@@ -35,7 +33,6 @@ const userSchema = new Schema(
         return !this.isGoogleUser; // Only required if not a Google user
       },
       minlength: 8,
-      maxlength: 20,
     },
     googleId: {
       type: String,

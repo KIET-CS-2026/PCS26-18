@@ -110,7 +110,7 @@ export default function SignupForm() {
                 name="phoneNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
+                    <FormLabel>Phone Number (Optional)</FormLabel>
                     <FormControl>
                       <Input placeholder="Enter your phone number" {...field} />
                     </FormControl>
