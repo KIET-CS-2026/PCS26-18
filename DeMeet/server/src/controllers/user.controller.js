@@ -174,11 +174,16 @@ const googleAuth = asyncHandler(async (req, res) => {
 const googleCallback = asyncHandler(async (req, res) => {
   try {
     if (!req.user) {
-      throw new apiError(HTTP_STATUS.UNAUTHORIZED, "Google authentication failed");
+      throw new apiError(
+        HTTP_STATUS.UNAUTHORIZED,
+        "Google authentication failed"
+      );
     }
 
-    const { accessToken, refreshToken } = await UserService.generateTokens(req.user._id);
-    
+    const { accessToken, refreshToken } = await UserService.generateTokens(
+      req.user._id
+    );
+
     logger.info(`User logged in via Google with ID: ${req.user._id}`);
 
     // Set cookies and redirect to frontend
@@ -196,7 +201,10 @@ const googleVerify = asyncHandler(async (req, res) => {
   const { idToken, googleId, name, email, avatar } = req.body;
 
   if (!idToken || !googleId || !name || !email) {
-    throw new apiError(HTTP_STATUS.BAD_REQUEST, "Missing required Google user data");
+    throw new apiError(
+      HTTP_STATUS.BAD_REQUEST,
+      "Missing required Google user data"
+    );
   }
 
   try {
@@ -209,9 +217,9 @@ const googleVerify = asyncHandler(async (req, res) => {
     // const payload = ticket.getPayload();
 
     // For development, we trust the frontend verification
-    
+
     let user = await UserService.findByGoogleId(googleId);
-    
+
     if (!user) {
       user = await UserService.createGoogleUser({
         googleId,
@@ -221,8 +229,10 @@ const googleVerify = asyncHandler(async (req, res) => {
       });
     }
 
-    const { accessToken, refreshToken } = await UserService.generateTokens(user._id);
-    
+    const { accessToken, refreshToken } = await UserService.generateTokens(
+      user._id
+    );
+
     logger.info(`User authenticated via Google token with ID: ${user._id}`);
 
     return res

@@ -74,10 +74,10 @@ export class UserService {
 
   static async createGoogleUser(googleUserData) {
     const { googleId, name, email, avatar } = googleUserData;
-    
+
     // Check if user exists with email
     let existingUser = await this.findByEmail(email);
-    
+
     if (existingUser) {
       // Link Google account to existing user
       existingUser.googleId = googleId;
@@ -88,7 +88,7 @@ export class UserService {
       await existingUser.save();
       return await this.findById(existingUser._id);
     }
-    
+
     // Create new Google user
     const user = await User.create({
       name,
@@ -97,7 +97,7 @@ export class UserService {
       isGoogleUser: true,
       avatar: avatar || undefined,
     });
-    
+
     return await this.findById(user._id);
   }
 

@@ -32,11 +32,17 @@ userRouter.route("/logout").post(logoutUser);
 // Google OAuth Routes
 userRouter
   .route("/auth/google")
-  .get(passport.authenticate("google", { scope: ["profile", "email"] }), googleAuth);
+  .get(
+    passport.authenticate("google", { scope: ["profile", "email"] }),
+    googleAuth
+  );
 
 userRouter
   .route("/auth/google/callback")
-  .get(passport.authenticate("google", { failureRedirect: "/auth" }), googleCallback);
+  .get(
+    passport.authenticate("google", { failureRedirect: "/auth" }),
+    googleCallback
+  );
 
 userRouter.route("/auth/google/verify").post(googleVerify);
 userRouter.route("/auth/google/success").get(verifyJWT, googleSuccess);

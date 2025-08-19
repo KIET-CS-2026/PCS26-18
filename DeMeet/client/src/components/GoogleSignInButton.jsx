@@ -1,13 +1,17 @@
-import { useState } from 'react';
-import PropTypes from 'prop-types';
-import { Button } from './ui/button';
-import { signInWithGooglePopup, getGoogleAuthUrl } from '@/utils/googleAuth';
-import axios from '@/lib/axios';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import useAuthStore from '@/store/authStore';
+import { useState } from "react";
+import PropTypes from "prop-types";
+import { Button } from "./ui/button";
+import { signInWithGooglePopup, getGoogleAuthUrl } from "@/utils/googleAuth";
+import axios from "@/lib/axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import useAuthStore from "@/store/authStore";
 
-const GoogleSignInButton = ({ disabled = false, variant = "outline", className = "" }) => {
+const GoogleSignInButton = ({
+  disabled = false,
+  variant = "outline",
+  className = "",
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { setUser, setTokens } = useAuthStore();
@@ -18,26 +22,31 @@ const GoogleSignInButton = ({ disabled = false, variant = "outline", className =
     try {
       // Get Google user data using popup
       const googleUserData = await signInWithGooglePopup();
-      
+
       // Send to backend for verification and account creation/linking
-      const response = await axios.post('/users/auth/google/verify', googleUserData);
-      
+      const response = await axios.post(
+        "/users/auth/google/verify",
+        googleUserData
+      );
+
       if (response.data.success) {
         const { user, accessToken, refreshToken } = response.data.data;
-        
+
         // Store user and tokens
         setUser(user);
         setTokens(accessToken, refreshToken);
-        
-        toast.success('Successfully signed in with Google!');
-        navigate('/dashboard');
+
+        toast.success("Successfully signed in with Google!");
+        navigate("/dashboard");
       }
     } catch (error) {
-      console.error('Google sign-in error:', error);
+      console.error("Google sign-in error:", error);
       if (error.response?.data?.message) {
         toast.error(error.response.data.message);
       } else {
-        toast.error(error.message || 'Google sign-in failed. Please try again.');
+        toast.error(
+          error.message || "Google sign-in failed. Please try again."
+        );
       }
     } finally {
       setIsLoading(false);
@@ -47,10 +56,10 @@ const GoogleSignInButton = ({ disabled = false, variant = "outline", className =
   // Method 2: Direct redirect to backend OAuth URL (simpler and more reliable)
   const handleGoogleSignInRedirect = () => {
     if (disabled || isLoading) return;
-    
+
     setIsLoading(true);
-    toast.info('Redirecting to Google Sign-In...');
-    
+    toast.info("Redirecting to Google Sign-In...");
+
     // Redirect to backend OAuth endpoint
     window.location.href = getGoogleAuthUrl();
   };
@@ -65,9 +74,25 @@ const GoogleSignInButton = ({ disabled = false, variant = "outline", className =
     >
       {isLoading ? (
         <>
-          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          <svg
+            className="animate-spin -ml-1 mr-3 h-5 w-5 text-current"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
           </svg>
           Redirecting...
         </>

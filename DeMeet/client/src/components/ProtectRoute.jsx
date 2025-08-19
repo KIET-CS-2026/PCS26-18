@@ -16,7 +16,7 @@ const ProtectRoute = ({ children, isPublic = false }) => {
   }
 
   if (user) {
-  return children;
+    return children;
   }
 
   if (!user) {

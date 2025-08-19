@@ -3,14 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useMeetService } from "@/services/meet/hooks";
 
 export default function Home() {
   const navigate = useNavigate();
   const [roomId, setRoomId] = useState("");
+  const { useCreateRoom } = useMeetService();
+  const { mutate, isLoading } = useCreateRoom();
 
   const createAndJoin = () => {
-    const roomId = uuidv4();
-    navigate(`/room/${roomId}`);
+    mutate();
   };
 
   const joinRoom = () => {
@@ -40,6 +42,7 @@ export default function Home() {
         <Button
           className="w-4/12 bg-green-500 text-white p-3 rounded-md hover:bg-green-600"
           onClick={createAndJoin}
+          disabled={isLoading}
         >
           Create a new room
         </Button>

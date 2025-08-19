@@ -29,7 +29,7 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      required: function() {
+      required: function () {
         return !this.isGoogleUser; // Only required if not a Google user
       },
       minlength: 8,

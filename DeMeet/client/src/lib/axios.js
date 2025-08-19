@@ -1,5 +1,5 @@
 import axios from "axios";
-import { api as baseURL } from "@/constants";
+import { api as baseURL, meetUrl } from "@/constants";
 import useAuthStore from "@/store/authStore";
 import { toast } from "sonner";
 
@@ -7,6 +7,14 @@ const api = axios.create({
   baseURL,
   withCredentials: true,
   timeout: 10000,
+});
+
+export const MeetApi = axios.create({
+  baseURL: meetUrl,
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": import.meta.env.VITE_API_KEY,
+  },
 });
 
 let isRefreshing = false;

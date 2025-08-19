@@ -39,15 +39,17 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 // Session configuration for passport
-app.use(session({
-  secret: config.session.secret,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: config.environment === 'prod',
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
-}));
+app.use(
+  session({
+    secret: config.session.secret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: config.environment === "prod",
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  })
+);
 
 // Initialize passport
 app.use(passport.initialize());
