@@ -1,7 +1,7 @@
-import passport from 'passport';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { config } from './index.js';
-import { User } from '../models/user.model.js';
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { config } from "./index.js";
+import { User } from "../models/user.model.js";
 
 passport.use(
   new GoogleStrategy(
@@ -39,7 +39,10 @@ passport.use(
           email: profile.emails[0].value,
           googleId: profile.id,
           isGoogleUser: true,
-          avatar: profile.photos && profile.photos.length > 0 ? profile.photos[0].value : undefined,
+          avatar:
+            profile.photos && profile.photos.length > 0
+              ? profile.photos[0].value
+              : undefined,
           // phoneNumber and password are not required for Google users
         });
 
@@ -57,7 +60,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await User.findById(id).select('-password -refreshToken');
+    const user = await User.findById(id).select("-password -refreshToken");
     done(null, user);
   } catch (error) {
     done(error, null);
