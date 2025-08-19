@@ -41,43 +41,50 @@ function App() {
         <div className="flex-1 overflow-hidden">
           <main className="h-full overflow-y-auto scrollbar-thin">
             <Context>
-            <div className="container mx-auto p-4 min-h-full flex items-center justify-center">
-              <Routes>
-                <Route
-                  path="/"
-                  element={
-                    <ProtectRoute isPublic>
-                      <LandingPage />
-                    </ProtectRoute>
-                  }
-                />
-                <Route
-                  path="login"
-                  element={
-                    <AuthRoute>
-                      <LoginForm />
-                    </AuthRoute>
-                  }
-                />
-                <Route
-                  path="signup"
-                  element={
-                    <AuthRoute>
-                      <SignupForm />
-                    </AuthRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectRoute>
-                      <Dashboard />
-                    </ProtectRoute>
-                  }
-                />
-                <Route path="/room/:roomId" element={<Room />} />
-              </Routes>
-            </div>
+              <div className="container mx-auto p-4 min-h-full flex items-center justify-center">
+                <Routes>
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectRoute isPublic>
+                        <LandingPage />
+                      </ProtectRoute>
+                    }
+                  />
+                  <Route
+                    path="login"
+                    element={
+                      <AuthRoute>
+                        <LoginForm />
+                      </AuthRoute>
+                    }
+                  />
+                  <Route
+                    path="signup"
+                    element={
+                      <AuthRoute>
+                        <SignupForm />
+                      </AuthRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectRoute>
+                        <Dashboard />
+                      </ProtectRoute>
+                    }
+                  />
+                  <Route
+                    path="/room/:roomId"
+                    element={
+                      <ProtectRoute>
+                        <Room />
+                      </ProtectRoute>
+                    }
+                  />
+                </Routes>
+              </div>
             </Context>
           </main>
         </div>

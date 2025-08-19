@@ -15,6 +15,10 @@ const ProtectRoute = ({ children, isPublic = false }) => {
     return children;
   }
 
+  if (user) {
+  return children;
+  }
+
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }

@@ -1,11 +1,14 @@
 import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import useAuthStore from "../store/authStore";
+import { useAuthService } from "@/services/user/hooks";
 
 const AuthRoute = ({ children }) => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { useCurrentUser } = useAuthService();
 
-  // If user is authenticated, redirect to dashboard
+  useCurrentUser();
+  const { user } = useAuthStore();
+
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }
