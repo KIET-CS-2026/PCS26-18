@@ -8,25 +8,27 @@ import { useMeetService } from "@/services/meet/hooks";
 export default function Home() {
   const navigate = useNavigate();
   const [roomId, setRoomId] = useState("");
-  const { useCreateRoom, useCreateSolanaRoom } = useMeetService();
-  const { mutate: createWeb2, isLoading: isCreatingWeb2 } = useCreateRoom();
+  const { useCreateSolanaRoom } = useMeetService();
+  // const { mutate: createWeb2, isLoading: isCreatingWeb2 } = useCreateRoom();
   const { mutate: createSolana, isLoading: isCreatingSolana } =
     useCreateSolanaRoom();
 
   const createWeb2Meeting = () => {
-    createWeb2();
+    const roomId = uuidv4();
+    navigate(`/room/${roomId}`);
   };
 
   const createSolanaMeeting = () => {
     createSolana();
   };
 
-  const joinRoom = () => {
-    if (roomId) navigate(`/room/${roomId}`);
-    else {
-      alert("Please provide a valid room id");
-    }
-  };
+  // const joinRoom = () => {
+  //   if (roomId) navigate(`/room/${roomId}`);
+  //   else {
+  //     alert("Please provide a valid room id");
+  //   }
+  // };
+
 
   // Sample scheduled meetings
   const scheduledMeetings = [
@@ -48,9 +50,10 @@ export default function Home() {
           <Button
             className="w-full bg-blue-500 text-white p-3 rounded-md hover:bg-blue-600"
             onClick={createWeb2Meeting}
-            disabled={isCreatingWeb2}
+            // disabled={isCreatingWeb2}
           >
-            {isCreatingWeb2 ? "Creating..." : "Create Meeting"}
+            {/* {isCreatingWeb2 ? "Creating..." : "Create Meeting"} */}
+            Create Meeting
           </Button>
         </div>
 
@@ -87,9 +90,25 @@ export default function Home() {
           />
           <Button
             className="w-full bg-green-500 text-white p-3 rounded-md hover:bg-green-600"
-            onClick={joinRoom}
+            onClick={() => {
+              if (roomId) navigate(`/room/${roomId}`);
+              else {
+                alert("Please provide a valid room id");
+              }
+            }}
           >
-            Join Room
+            Join Web2 Room
+          </Button>
+          <Button
+            className="w-full bg-green-500 text-white p-3 rounded-md hover:bg-green-600"
+            onClick={() => {
+              if (roomId) navigate(`/solana-room/${roomId}`);
+              else {
+                alert("Please provide a valid room id");
+              }
+            }}
+          >
+            Join Solana Gated Room
           </Button>
         </div>
 
