@@ -10,10 +10,14 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
+    // Temporarily disable socket connection since we're using Huddle01 iframe
+    // The socket connection will be enabled when we need real-time features
+    // outside of the meeting room (like notifications, live updates, etc.)
+    
+    /* 
     const connection = io("http://localhost:5000", {
       transports: ["websocket"],
-    }); // Adjust if hosted
-    // console.log("Socket connected", connection);
+    });
     setSocket(connection);
 
     connection.on("connect_error", (err) => {
@@ -23,6 +27,7 @@ export const SocketProvider = ({ children }) => {
     return () => {
       connection.close();
     };
+    */
   }, []);
 
   SocketProvider.propTypes = {
