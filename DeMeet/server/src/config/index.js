@@ -45,14 +45,14 @@ export const config = {
     origin:
       process.env.ENVIRONMENT === "dev"
         ? "http://localhost:5173"
-        : "https://yourproductionurl.com",
+        : "https://de-meet.vercel.app",
     credentials: true,
   },
 
   cookie: {
     httpOnly: true,
-    secure: process.env.ENVIRONMENT === "prod",
-    sameSite: "lax",
+    secure: process.env.ENVIRONMENT === "dev" ? false : true,
+    sameSite: process.env.ENVIRONMENT === "dev" ? "lax" : "none",
     path: "/",
     maxAge: 15 * 24 * 60 * 60 * 1000,
   },
