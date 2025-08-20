@@ -83,6 +83,14 @@ function App() {
                       </ProtectRoute>
                     }
                   />
+                  <Route
+                    path="/solana-room/:roomId"
+                    element={
+                      <ProtectRoute>
+                        <SolanaRoom />
+                      </ProtectRoute>
+                    }
+                  />
                 </Routes>
               </div>
             </Context>

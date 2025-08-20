@@ -36,7 +36,7 @@ const HuddleRoom = ({ roomId }) => {
   return (
     <HuddleIframe
       roomUrl={`https://iframe.huddle01.com/${roomId}/lobby`}
-      className="aspect-video w-full max-h-[calc(100vh-12rem)]"
+      className="w-full h-full border-none"
       projectId={import.meta.env.VITE_PROJECT_ID}
     />
   );
