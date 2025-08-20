@@ -9,8 +9,8 @@ import Dashboard from "./pages/Dashboard";
 import AuthRoute from "./components/AuthRoute";
 import Footer from "./components/Footer/Footer";
 import Room from "./pages/Room";
+import SolanaRoom from "./pages/SolanaRoom";
 import { Toaster } from "sonner";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import {
   ConnectionProvider,
   WalletProvider,
