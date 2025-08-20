@@ -21,5 +21,20 @@ export function useMeetService() {
     });
   }
 
-  return { useCreateRoom };
+  // New: create and navigate to Solana-gated room
+  function useCreateSolanaRoom() {
+    return useMutation({
+      mutationFn: meetApi.createRoom,
+      onSuccess: (response) => {
+        toast.success(response.data.message);
+        const { roomId } = response.data.data;
+        navigate(`/solana-room/${roomId}`);
+      },
+      onError: (error) => {
+        toast.error(error.response?.data?.message || "Failed to create room");
+      },
+    });
+  }
+
+  return { useCreateRoom, useCreateSolanaRoom };
 }

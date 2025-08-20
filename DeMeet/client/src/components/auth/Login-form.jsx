@@ -25,7 +25,7 @@ import GoogleSignInButton from "../GoogleSignInButton";
 // import { useAuth } from "../../contexts/AuthContext";
 // import { useWallet } from "@solana/wallet-adapter-react";
 // import { toast } from "sonner";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+// import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 const LoginForm = () => {
   const { useLogin } = useAuthService();
@@ -157,9 +157,9 @@ const LoginForm = () => {
             </span>
           </div>
         </div>
-        <div className="flex justify-center mb-4">
+        {/* <div className="flex justify-center mb-4">
           <WalletMultiButton />
-        </div>
+        </div> */}
         <GoogleSignInButton disabled={loginMutation.isPending} />
       </CardContent>
       <CardFooter className="flex justify-center">
