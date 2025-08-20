@@ -8,28 +8,17 @@ import { useMeetService } from "@/services/meet/hooks";
 export default function Home() {
   const navigate = useNavigate();
   const [roomId, setRoomId] = useState("");
-  const { useCreateRoom } = useMeetService();
-  const { mutate, isLoading } = useCreateRoom();
+  const { useCreateRoom, useCreateSolanaRoom } = useMeetService();
+  const { mutate: createWeb2, isLoading: isCreatingWeb2 } = useCreateRoom();
+  const { mutate: createSolana, isLoading: isCreatingSolana } =
+    useCreateSolanaRoom();
 
   const createWeb2Meeting = () => {
-    mutate();
+    createWeb2();
   };
 
   const createSolanaMeeting = () => {
-    // Use the same service as Web2 meeting but navigate to solana-room
-    mutate(undefined, {
-      onSuccess: (data) => {
-        // Assuming the service returns room data with roomId
-        const roomId = data?.roomId || uuidv4();
-        navigate(`/solana-room/${roomId}`);
-      },
-      onError: (error) => {
-        console.error("Error creating Solana meeting:", error);
-        // Fallback to UUID if service fails
-        const roomId = uuidv4();
-        navigate(`/solana-room/${roomId}`);
-      },
-    });
+    createSolana();
   };
 
   const joinRoom = () => {
@@ -59,9 +48,9 @@ export default function Home() {
           <Button
             className="w-full bg-blue-500 text-white p-3 rounded-md hover:bg-blue-600"
             onClick={createWeb2Meeting}
-            disabled={isLoading}
+            disabled={isCreatingWeb2}
           >
-            {isLoading ? "Creating..." : "Create Meeting"}
+            {isCreatingWeb2 ? "Creating..." : "Create Meeting"}
           </Button>
         </div>
 
@@ -76,8 +65,9 @@ export default function Home() {
           <Button
             className="w-full bg-purple-500 text-white p-3 rounded-md hover:bg-purple-600"
             onClick={createSolanaMeeting}
+            disabled={isCreatingSolana}
           >
-            Create Solana Meeting
+            {isCreatingSolana ? "Creating..." : "Create Solana Meeting"}
           </Button>
         </div>
 

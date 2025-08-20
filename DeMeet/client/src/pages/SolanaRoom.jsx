@@ -70,9 +70,9 @@ export default function SolanaRoom() {
 
   // Access granted - show the meeting room
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-full w-full overflow-hidden">
       {/* Header */}
-      <div className="flex justify-between items-center p-4 bg-card border-b">
+      <div className="flex justify-between items-center p-4 bg-card border-b shrink-0">
         <div>
           <h1 className="text-foreground text-xl font-semibold">
             Solana Token-Gated Room
@@ -87,12 +87,13 @@ export default function SolanaRoom() {
         </div>
       </div>
 
-      <div className="flex-1 h-full">
+      {/* Expanded meeting container */}
+      <div className="flex-1 min-h-0 w-full overflow-hidden bg-gray-800">
         <HuddleRoom roomId={roomId} />
       </div>
 
       {/* Status indicator */}
-      <div className="p-2 bg-muted text-center">
+      <div className="p-2 bg-muted text-center shrink-0">
         <span className="text-sm text-muted-foreground">
           Connected as: {publicKey?.toString().slice(0, 8)}...
           {publicKey?.toString().slice(-8)}

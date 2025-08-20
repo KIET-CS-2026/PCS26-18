@@ -41,58 +41,67 @@ function App() {
         <div className="flex-1 overflow-hidden">
           <main className="h-full overflow-y-auto scrollbar-thin">
             <Context>
-              <div className="container mx-auto p-4 min-h-full flex items-center justify-center">
-                <Routes>
-                  <Route
-                    path="/"
-                    element={
-                      <ProtectRoute isPublic>
+              {/* Removed the global container wrapper */}
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <ProtectRoute isPublic>
+                      <div className="container mx-auto p-4 min-h-full flex items-center justify-center">
                         <LandingPage />
-                      </ProtectRoute>
-                    }
-                  />
-                  <Route
-                    path="login"
-                    element={
-                      <AuthRoute>
+                      </div>
+                    </ProtectRoute>
+                  }
+                />
+                <Route
+                  path="login"
+                  element={
+                    <AuthRoute>
+                      <div className="container mx-auto p-4 min-h-full flex items-center justify-center">
                         <LoginForm />
-                      </AuthRoute>
-                    }
-                  />
-                  <Route
-                    path="signup"
-                    element={
-                      <AuthRoute>
+                      </div>
+                    </AuthRoute>
+                  }
+                />
+                <Route
+                  path="signup"
+                  element={
+                    <AuthRoute>
+                      <div className="container mx-auto p-4 min-h-full flex items-center justify-center">
                         <SignupForm />
-                      </AuthRoute>
-                    }
-                  />
-                  <Route
-                    path="/dashboard"
-                    element={
-                      <ProtectRoute>
+                      </div>
+                    </AuthRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectRoute>
+                      <div className="container mx-auto p-4 min-h-full flex items-center justify-center">
                         <Dashboard />
-                      </ProtectRoute>
-                    }
-                  />
-                  <Route
-                    path="/room/:roomId"
-                    element={
-                      <ProtectRoute>
-                        <Room />
-                      </ProtectRoute>
-                    }
-                  />
-                  <Route
-                    path="/solana-room/:roomId"
-                    element={
-                      <ProtectRoute>
-                        <SolanaRoom />
-                      </ProtectRoute>
-                    }
-                  />
-                </Routes>
-              </div>
+                      </div>
+                    </ProtectRoute>
+                  }
+                />
+                <Route
+                  path="/room/:roomId"
+                  element={
+                    <ProtectRoute>
+                      {/* Full-width room page */}
+                      <Room />
+                    </ProtectRoute>
+                  }
+                />
+                <Route
+                  path="/solana-room/:roomId"
+                  element={
+                    <ProtectRoute>
+                      {/* Full-width solana room page */}
+                      <SolanaRoom />
+                    </ProtectRoute>
+                  }
+                />
+              </Routes>
             </Context>
           </main>
         </div>
