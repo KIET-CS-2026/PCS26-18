@@ -18,8 +18,6 @@ export default function Navbar() {
   const { useLogout } = useAuthService();
   const logoutMutation = useLogout();
 
-  console.log("Navbar user:", user);
-
   const handleLogout = () => {
     logoutMutation.mutate();
   };
