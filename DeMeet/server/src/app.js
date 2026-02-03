@@ -59,11 +59,13 @@ app.use(passport.session());
 import userRouter from "./routes/user.routes.js";
 import healthRouter from "./routes/health.routes.js";
 import meetingRouter from "./routes/meeting.routes.js";
+import chatRouter from "./routes/chat.routes.js";
 
 //routes declaration
 app.use("/api/health", healthRouter);
 app.use("/api/users", userRouter);
 app.use("/api/meetings", meetingRouter);
+app.use("/api/chat", chatRouter);
 
 app.use(errorHandler);
 export default app;

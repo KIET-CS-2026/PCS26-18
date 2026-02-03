@@ -3,6 +3,11 @@ import http from "http";
 import { Server } from "socket.io";
 import { config } from "./config/index.js";
 import logger from "./utils/logger.js";
+import { ChatMessage } from "./models/chatMessage.model.js";
+import connectDB from "./db/index.js";
+
+// Connect to MongoDB for chat messages
+connectDB();
 
 const app = express();
 const server = http.createServer(app);
@@ -21,7 +26,7 @@ const polls = {};
 const handleSocketConnection = (socket) => {
   logger.info(`User connected: ${socket.id}`);
 
-  socket.on("join-room", (roomId, userId) => {
+  socket.on("join-room", async (roomId, userId) => {
     logger.info(`User ${userId} joined room ${roomId}`);
     socket.join(roomId);
     socket.broadcast.to(roomId).emit("user-connected", userId);
@@ -29,6 +34,17 @@ const handleSocketConnection = (socket) => {
     // Send existing poll if any
     if (polls[roomId]) {
       socket.emit("poll-created", polls[roomId]);
+    }
+
+    // Send recent chat history
+    try {
+      const messages = await ChatMessage.find({ roomId })
+        .sort({ createdAt: -1 })
+        .limit(20)
+        .lean();
+      socket.emit("chat-history", messages.reverse());
+    } catch (error) {
+      logger.error(`Error fetching chat history: ${error.message}`);
     }
   });
 
@@ -77,6 +93,38 @@ const handleSocketConnection = (socket) => {
     if (poll && poll.createdBy === userId) {
       poll.ended = true;
       io.to(roomId).emit("poll-updated", poll);
+    }
+  });
+
+  // Chat messages
+  socket.on("send-message", async ({ roomId, senderId, senderName, message }) => {
+    if (!roomId || !senderId || !message) {
+      logger.warn("Invalid chat message received");
+      return;
+    }
+
+    try {
+      // Save message to MongoDB
+      const chatMessage = await ChatMessage.create({
+        roomId,
+        senderId,
+        senderName: senderName || "Anonymous",
+        message,
+      });
+
+      logger.info(`Chat message saved in room ${roomId} by ${senderName}`);
+
+      // Broadcast to all users in the room (including sender)
+      io.to(roomId).emit("receive-message", {
+        _id: chatMessage._id,
+        roomId: chatMessage.roomId,
+        senderId: chatMessage.senderId,
+        senderName: chatMessage.senderName,
+        message: chatMessage.message,
+        createdAt: chatMessage.createdAt,
+      });
+    } catch (error) {
+      logger.error(`Error saving chat message: ${error.message}`);
     }
   });
 };

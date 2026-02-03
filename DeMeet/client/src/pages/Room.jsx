@@ -5,17 +5,19 @@ import usePeer from "@/hooks/usePeer";
 import useMediaStream from "@/hooks/useMediaStream";
 import usePlayer from "@/hooks/usePlayer";
 import { useParams } from "react-router-dom"; // Use React Router's useParams
+import useAuthStore from "@/store/authStore";
 
 import Player from "@/components/Room/Player";
 import Bottom from "@/components/Room/Bottom";
 import CopySection from "@/components/Room/CopySection";
-
 import PollModal from "@/components/Room/PollModal";
+import ChatPanel from "@/components/Room/ChatPanel";
 
 const Room = () => {
   const socket = useSocket();
   const { roomId } = useParams(); // Access roomId from the URL
   const { peer, myId } = usePeer();
+  const { user } = useAuthStore();
   const { stream, screenStream, startScreenShare, stopScreenShare } =
     useMediaStream();
   const {
@@ -35,6 +37,10 @@ const Room = () => {
   const [isPollModalOpen, setIsPollModalOpen] = useState(false);
   const [activePoll, setActivePoll] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
+
+  // Chat state
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
 
   const toggleScreenShare = async () => {
     if (isScreenSharing) {
@@ -101,6 +107,27 @@ const Room = () => {
     return () => {
       socket.off("poll-created", handlePollCreated);
       socket.off("poll-updated", handlePollUpdated);
+    };
+  }, [socket]);
+
+  // Chat socket events
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleChatHistory = (history) => {
+      setMessages(history);
+    };
+
+    const handleReceiveMessage = (message) => {
+      setMessages((prev) => [...prev, message]);
+    };
+
+    socket.on("chat-history", handleChatHistory);
+    socket.on("receive-message", handleReceiveMessage);
+
+    return () => {
+      socket.off("chat-history", handleChatHistory);
+      socket.off("receive-message", handleReceiveMessage);
     };
   }, [socket]);
 
@@ -251,6 +278,7 @@ const Room = () => {
           isScreenSharing={isScreenSharing}
           toggleScreenShare={toggleScreenShare}
           togglePollModal={() => setIsPollModalOpen(true)}
+          toggleChat={() => setIsChatOpen(true)}
         />
       </div>
 
@@ -263,6 +291,17 @@ const Room = () => {
         hasVoted={hasVoted}
         setHasVoted={setHasVoted}
         myId={myId}
+      />
+
+      <ChatPanel
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        socket={socket}
+        roomId={roomId}
+        userId={user?._id}
+        myName={user?.name}
+        messages={messages}
+        setMessages={setMessages}
       />
     </div>
   );

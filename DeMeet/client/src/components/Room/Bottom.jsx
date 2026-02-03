@@ -6,6 +6,7 @@ import {
   VideoOff,
   Monitor,
   BarChart,
+  MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PropTypes from "prop-types";
@@ -21,10 +22,11 @@ const Bottom = (props) => {
     isScreenSharing,
     toggleScreenShare,
     togglePollModal,
+    toggleChat,
   } = props;
 
   return (
-    <div className="absolute flex justify-between bottom-5 left-0 right-0 mx-auto w-[400px]">
+    <div className="absolute flex justify-between bottom-5 left-0 right-0 mx-auto w-[480px]">
       <Button
         variant="outline"
         size="icon"
@@ -77,6 +79,14 @@ const Bottom = (props) => {
         <BarChart className="h-7 w-7" />
       </Button>
       <Button
+        variant="outline"
+        size="icon"
+        className="h-14 w-14 rounded-full bg-background hover:bg-background/90"
+        onClick={toggleChat}
+      >
+        <MessageCircle className="h-7 w-7" />
+      </Button>
+      <Button
         variant="destructive"
         size="icon"
         className="h-14 w-14 rounded-full"
@@ -97,6 +107,7 @@ Bottom.propTypes = {
   isScreenSharing: PropTypes.bool.isRequired,
   toggleScreenShare: PropTypes.func.isRequired,
   togglePollModal: PropTypes.func.isRequired,
+  toggleChat: PropTypes.func.isRequired,
 };
 
 export default Bottom;
