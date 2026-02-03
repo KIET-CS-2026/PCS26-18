@@ -10,6 +10,8 @@ import Player from "@/components/Room/Player";
 import Bottom from "@/components/Room/Bottom";
 import CopySection from "@/components/Room/CopySection";
 
+import PollModal from "@/components/Room/PollModal";
+
 const Room = () => {
   const socket = useSocket();
   const { roomId } = useParams(); // Access roomId from the URL
@@ -28,6 +30,11 @@ const Room = () => {
 
   const [users, setUsers] = useState([]);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
+
+  // Poll state
+  const [isPollModalOpen, setIsPollModalOpen] = useState(false);
+  const [activePoll, setActivePoll] = useState(null);
+  const [hasVoted, setHasVoted] = useState(false);
 
   const toggleScreenShare = async () => {
     if (isScreenSharing) {
@@ -74,6 +81,28 @@ const Room = () => {
       }
     }
   };
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handlePollCreated = (poll) => {
+      setActivePoll(poll);
+      setHasVoted(false);
+      setIsPollModalOpen(true);
+    };
+
+    const handlePollUpdated = (poll) => {
+      setActivePoll(poll);
+    };
+
+    socket.on("poll-created", handlePollCreated);
+    socket.on("poll-updated", handlePollUpdated);
+
+    return () => {
+      socket.off("poll-created", handlePollCreated);
+      socket.off("poll-updated", handlePollUpdated);
+    };
+  }, [socket]);
 
   useEffect(() => {
     if (!socket || !peer || !stream) return;
@@ -221,8 +250,20 @@ const Room = () => {
           leaveRoom={leaveRoom}
           isScreenSharing={isScreenSharing}
           toggleScreenShare={toggleScreenShare}
+          togglePollModal={() => setIsPollModalOpen(true)}
         />
       </div>
+
+      <PollModal
+        isOpen={isPollModalOpen}
+        onClose={() => setIsPollModalOpen(false)}
+        socket={socket}
+        roomId={roomId}
+        activePoll={activePoll}
+        hasVoted={hasVoted}
+        setHasVoted={setHasVoted}
+        myId={myId}
+      />
     </div>
   );
 };
