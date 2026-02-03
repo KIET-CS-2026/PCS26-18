@@ -1,4 +1,12 @@
-import { Mic, Video, PhoneOff, MicOff, VideoOff, Monitor } from "lucide-react";
+import {
+  Mic,
+  Video,
+  PhoneOff,
+  MicOff,
+  VideoOff,
+  Monitor,
+  BarChart,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PropTypes from "prop-types";
 import { cn } from "@/lib/utils";
@@ -12,6 +20,7 @@ const Bottom = (props) => {
     leaveRoom,
     isScreenSharing,
     toggleScreenShare,
+    togglePollModal,
   } = props;
 
   return (
@@ -60,6 +69,14 @@ const Bottom = (props) => {
         <Monitor className="h-7 w-7" />
       </Button>
       <Button
+        variant="outline"
+        size="icon"
+        className="h-14 w-14 rounded-full bg-background hover:bg-background/90"
+        onClick={togglePollModal}
+      >
+        <BarChart className="h-7 w-7" />
+      </Button>
+      <Button
         variant="destructive"
         size="icon"
         className="h-14 w-14 rounded-full"
@@ -79,6 +96,7 @@ Bottom.propTypes = {
   leaveRoom: PropTypes.func.isRequired,
   isScreenSharing: PropTypes.bool.isRequired,
   toggleScreenShare: PropTypes.func.isRequired,
+  togglePollModal: PropTypes.func.isRequired,
 };
 
 export default Bottom;
