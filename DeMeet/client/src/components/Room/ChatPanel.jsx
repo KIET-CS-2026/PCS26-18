@@ -29,6 +29,16 @@ export default function ChatPanel({
   const messagesEndRef = useRef(null);
   const isInitialLoad = useRef(true);
 
+  // Scroll to bottom when panel opens
+  useEffect(() => {
+    if (isOpen && messages.length > 0) {
+      // Use setTimeout to ensure the panel has rendered
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
+      }, 100);
+    }
+  }, [isOpen]);
+
   // Auto-scroll to bottom on new messages (only if near bottom)
   useEffect(() => {
     if (isInitialLoad.current && messages.length > 0) {
