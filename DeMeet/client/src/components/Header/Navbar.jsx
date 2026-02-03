@@ -1,12 +1,4 @@
-import {
-  BellRing,
-  CircleUser,
-  Settings,
-  User2,
-  LogOut,
-  LogIn,
-  UserPlus,
-} from "lucide-react";
+import { BellRing, CircleUser, LogOut, LogIn, UserPlus } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -18,6 +10,7 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "@/store/authStore";
 import { useAuthService } from "@/services/user/hooks";
+import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 
 export default function Navbar() {
   const { user } = useAuthStore();
@@ -59,19 +52,22 @@ export default function Navbar() {
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <CircleUser className="h-5 w-5" />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full"
+                    >
+                      <Avatar className="h-6 w-6">
+                        {user.avatar && (
+                          <AvatarImage src={user.avatar} alt={user.name} />
+                        )}
+                        <AvatarFallback>
+                          <CircleUser className="h-5 w-5" />
+                        </AvatarFallback>
+                      </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => navigate("/profile")}>
-                      <User2 className="mr-2 h-4 w-4" />
-                      Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate("/settings")}>
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
                       Logout
